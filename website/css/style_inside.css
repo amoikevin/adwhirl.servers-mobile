@@ -1,0 +1,282 @@
+/*
+ -----------------------------------------------------------------------
+Copyright 2009 AdMob, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+------------------------------------------------------------------------
+*/
+/* CSS Document */
+body{margin:0; padding:0; background:url(../images/mainbg.gif) 0 0 repeat-x #fff; font:14px/18px Georgia, "Times New Roman", Times, serif; color:#666;}
+div, p, ul, h1, h2, h3, h4, form{margin:0px; padding:0px;}
+ul{list-style-type:none;}
+
+img {
+ border: none;
+}
+
+a {
+	text-decoration:none;
+	color:#0099cc;
+}
+a.delete {
+	text-decoration:none;
+	color:#990000;
+}
+a:hover {
+	text-decoration:underline;
+}
+
+.download_headers {
+	font-size:18px;
+	margin:20px 0px 5px 0px;
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+.download_headers1 {
+	font-size:17px;
+	margin:20px 0px 5px 0px;
+	text-decoration: underline;
+}
+
+.download_headers2 {
+	font-size:13px;
+	margin:20px 0px 5px 0px;
+	text-decoration: underline;
+}
+
+.download_content {
+	font-size:12px;
+	color:#666;
+}
+
+.download_content ul{
+	list-style-type:disc;
+}
+
+.download_content li{
+	margin:0 0 0 5px;
+	padding:0;
+}
+
+.dl_button_small {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:transparent url(../images/button.png) no-repeat scroll 0 -30px;
+color:white;
+display:block;
+font-size:14px;
+font-weight:bold;
+line-height:48px;
+position:relative;
+text-align:center;
+text-decoration:none;
+width:203px;
+}
+
+/*--Login Info--*/
+#loginInfo{position:absolute; top:0px; right:0px; display:block; float:right; padding:0;}
+
+/*--Top Panel--*/
+#topPan{width:900px; height:104px; position:relative; margin:0 auto; padding:0;}
+
+#topPan img{width:265px; height:39px; display:block; position:absolute; top:39px; left:0px;}
+#topPan ul {
+    position: absolute;
+    top: 3.3em;
+    right: 0;
+    background-color: #6CF;
+}
+#topPan li {
+    float: left;
+    display: block;
+    padding: 0 1em;
+}
+#topPan li a {
+    display:block;
+    text-decoration:none;
+    text-align:center;
+    font: bold 13px/27px Arial, Helvetica, sans-serif;
+    color: #FFF;
+}
+
+#topPan ul li a:hover{background:url(../images/bullet1.gif) 50% 0 no-repeat #66ccff; color:#fff; text-decoration:none;}
+#topPan ul li.company{background:url(../images/bullet1.gif) 50% 0 no-repeat #66ccff; color:#fff; text-decoration:none; font:13px/27px Arial, Helvetica, sans-serif; font-weight:bold; text-align:center;}
+/*--/Top Panel--*/
+
+
+/*--/App Form START--*/
+#appForm{width:960px; position:relative; margin:0 auto; padding:0;}
+/*--/App Form END--*/
+
+
+/*--Lower Panel--*/
+#mainlowerPan{min-height:680px; background:url(../images/middlepanbg.gif) 0 0 repeat-x #F0F0F0; color:#666; padding:0 0 0;}
+#lowerPan{width:960px; position:relative; margin:0 auto;}
+/*--/Lower Panel--*/
+
+
+/*---FOOTER PANEL--*/
+#footermainPan{height:36px; background:#fff; color:#fff; margin:0; padding:0; clear:both;}
+#footerPan{width:960px; position:relative; margin:0 auto;}
+#footerPan img{width:248px; height:28px; position:absolute; top:23px; right:6px;}
+
+#footerPan ul{width:500px; position:absolute; top:12px; left:49px;}
+#footerPan li{float:left; font:12px/15px "Trebuchet MS",Arial, Helvetica, sans-serif; font-weight:normal;}
+#footerPan ul li a{padding:0 0 0 12px; color:#777777; background:#fff; text-decoration:none;}
+#footerPan ul li a:hover{text-decoration:underline;}
+
+#footerPan ul.templateworld{width:158px; background:#7D7D7D; color:#fff; display:block; position:absolute; top:120px; left:61px;}
+#footerPan ul.templateworld li a{background:#7D7D7D; display:block; color:#fff; text-decoration:none;}
+#footerPan ul.templateworld li a:hover{text-decoration:underline;}
+
+.onOffImg {
+  width: 57px;
+  overflow: hidden;
+}
+.onOffImg img.on {
+  margin-left: -56px;
+}
+.onOffImg img.off {
+}
+.onOffImg img.disabled {
+  margin-left: -112px;
+}
+
+div.disabledMsg {
+ margin-left: 3px;
+}
+
+table {
+ border-spacing: 0px;
+}
+
+table.apiTextNotGeneric {
+
+}
+
+div.networkName {
+ padding-left: 3px;
+ color: #003366;
+}
+
+div.networkNameRoll {
+ color: #003366;
+}
+
+div#appFormLeft {
+ position: absolute;
+ left: 0px;
+}
+
+div#appFormRight {
+    float:right;
+}
+
+div#adStatus {
+position: absolute;
+right: 63px;
+top: 8px;
+    font: bold 10px sans-serif;
+}
+
+div#onOffMainDiv{
+float: right;
+  margin-left: 200px;
+}
+
+tr, tr {
+  margin: 0px;
+  padding: 0px;
+}
+
+.networkNameTD {
+ border-top: 1px dotted #cccccc;
+ padding-top: 5px;
+ padding-bottom: 0px;
+ margin-bottom: 0px;
+}
+
+div.errorMsg {
+width: 600px;
+margin-left: auto; margin-right: auto; background:#ffcccc;
+border: thin solid #990000;
+text-align: center;
+color: #990000;
+}
+
+div.successMsg {
+width: 500px;
+margin-left: auto; margin-right: auto; background:#ccffcc;
+border: thin solid #006600;
+text-align: center;
+color: #006600;
+}
+
+
+/* begin css tabs */
+ul#tabnav { /* general settings */
+text-align: left; /* set to left, right or center */
+margin: 1em 0 1em 0; /* set margins as desired */
+font: bold 11px verdana, arial, sans-serif; /* set font as desired */
+border-bottom: 1px solid #0099cc; /* set border COLOR as desired */
+list-style-type: none;
+padding: 3px 10px 3px 10px; /* THIRD number must change with respect to padding-top (X) below */
+}
+
+ul#tabnav li { /* do not change */
+display: inline;
+}
+
+div#tab1 li.tab1, div#tab2 li.tab2, div#tab3 li.tab3, div#tab4 li.tab4, div#tab5 li.tab5, div#tab6 li.tab6, div#tab7 li.tab7, div#tab8 li.tab8 { /* settings for selected tab */
+border-bottom: 1px solid #fff; /* set border color to page background color */
+background-color: #fff; /* set background color to match above border color */
+}
+
+div#tab1 li.tab1 a, div#tab2 li.tab2 a, div#tab3 li.tab3 a, div#tab4 li.tab4 a, div#tab5 li.tab5 a, div#tab6 li.tab6 a, div#tab7 li.tab7 a, div#tab8 li.tab8 a { /* settings for selected tab link */
+background-color: #fff; /* set selected tab background color as desired */
+color: #000; /* set selected tab link color as desired */
+position: relative;
+top: 1px;
+padding-top: 4px; /* must change with respect to padding (X) above and below */
+}
+
+ul#tabnav li a { /* settings for all tab links */
+padding: 3px 4px; /* set padding (tab size) as desired; FIRST number must change with respect to padding-top (X) above */
+border: 1px solid #0099cc; /* set border COLOR as desired; usually matches border color specified in #tabnav */
+background-color: #ccffff; /* set unselected tab background color as desired */
+color: #666; /* set unselected tab link color as desired */
+margin-right: 0px; /* set additional spacing between tabs as desired */
+text-decoration: none;
+border-bottom: none;
+}
+
+ul#tabnav a:hover { /* settings for hover effect */
+background: #fff; /* set desired hover color */
+}
+
+.tab_right {
+    float: right;
+}
+
+#help_contact {
+    border-bottom: 1px dotted #cccccc
+}
+
+#instruct13 {
+    font-size: 10pt;
+}
+
+/* end css tabs */
+

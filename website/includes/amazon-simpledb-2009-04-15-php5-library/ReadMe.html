@@ -1,0 +1,209 @@
+<?php
+<!--
+ -----------------------------------------------------------------------
+Copyright 2009 AdMob, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+------------------------------------------------------------------------
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+
+        <title>SimpleDB PHP Library</title>
+        <style type="text/css">
+            body, div, p, td, th {
+                font-family : helvetica,sans-serif, arial;
+                font-size : 12px;
+                color : #000000;
+            }
+
+            .aws-h1, h1{
+                font-family: verdana, arial, helvetica, sans-serif;
+                font-size: 18px;
+                font-weight: bold;
+                color: #000000;
+            }
+            .aws-h2, h2{
+                font-family: verdana, arial, helvetica, sans-serif;
+                font-size: 14px;
+                color: #c60;
+            }
+            .aws-h3, h3{
+                font-family: verdana, arial, helvetica, sans-serif;
+                font-size: 12px;
+                font-weight: bold;
+                color: #333333;
+            }
+
+            /*table ID selector styles*/
+            #aws-table {
+                border-top: 1px solid #cccccc;
+                border-left: 1px solid #cccccc;
+                width:95%;
+            }
+
+            #aws-table td{
+                font-size: 12px;
+                padding: 5px 5px 5px 5px;
+                border-bottom: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
+                vertical-align:top;
+            }
+
+            #aws-table th {
+                font-size: 12px;
+                padding: 5px 5px 5px 5px;
+                border-bottom: 1px solid #cccccc;
+                border-right: 1px solid #cccccc;
+                vertical-align:top;
+                background-color: #eeeeee;
+                color: #333333;
+                font-size: 12px;
+                font-weight: bold;
+                text-align: left;
+            }
+
+            /*code, note, and example styles*/
+            pre {
+                font-family: "Courier New", Courier, mono;
+                font-size: 12px;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                color: #000066;
+                padding: 5px;
+                background-color: #eff7ff;
+                border: 1px dashed #333;
+                width:75%;
+                display:block;
+            }
+
+        </style>
+    </head>
+    <body>
+        <h2>About this Library</h2>
+        <ul><li>Based on the 2009-04-15 API version.</li></ul>
+        <h2>What&#39;s New?</h2>
+        <ul>
+
+ <li><b>2009-05-07</b>: Deprecate Query and QueryWithAttributes. Please migrate to Select API</li>
+            <li><b>2009-03-23</b>: Support for BatchPutAttributes</li>
+            <li><b>2009-01-26</b>: Fix missing parenthesis error ("unexpected T_STRING")</li>
+            <li><b>2008-12-24</b>: Fix notice output (no side effects, just noise)</li>
+            <li><b>2008-12-23</b>:Url encoding fix (some calls with signature version 2 were affected)</li>
+            <li><b>2008-12-17</b>: Support for signature version 2, DomainMetadata and Select API, https endpoint</li>
+            <li><b>2008-08-28</b>: Support for new API - <a href="http://docs.amazonwebservices.com/AmazonSimpleDB/2007-11-07/DeveloperGuide/SDB_API_QueryWithAttributes.html">QueryWithAttributes</a></li>
+            <li>2008-07-23: Fixed signature-related sort issue, support for .config.inc.php configuration for all samples</li>
+        </ul>
+        <h2>Prerequisites</h2>
+
+        <ul>
+            <li>Amazon SimpleDB account (<a href="http://aws.amazon.com/simpledb">http://aws.amazon.com/simpledb</a>).</li>
+            <li>PHP 5.2.1 or newer (<a href="http://www.php.net/">http://www.php.net/</a>)</li>
+        </ul>
+
+        <h2>Reference Documentation</h2>
+        <ul>
+            <li><a href="http://s3.amazonaws.com/awscode/amazon-simpledb/2009-04-15/php5/library/doc/index.html">Online PHP Docs</a></li>
+        </ul>
+
+        <h2>Package Content</h2>
+
+        <table id="aws-table">
+
+            <tbody>
+                <tr>
+                    <th>Directory</th>
+                    <th>Overview</th>
+                </tr>
+
+                <tr>
+                    <td>
+                        src
+                    </td>
+                    <td>
+                        Source distribution of library.
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+
+        <h2>Quick Start</h2>
+
+        Library comes with code samples for each available service API.
+        To get started with the library, follow these steps:
+        <ol>
+            <li>Extract the <strong>amazon-simpledb-2009-04-15-php5-library.zip</strong> file into a working directory.</li>
+            <li>Go to src/Amazon/SimpleDB/Samples subdirectopry</li>
+            <li>Edit .config.inc.php:</li>
+   <br/>
+
+            <br/>
+            <ul>
+                <li>Set AWS Access Key ID and AWS Secret Access Key</li>
+                <pre>
+    define('AWS_ACCESS_KEY_ID', '&lt;Your Access Key ID&gt;');
+    define('AWS_SECRET_ACCESS_KEY', '&lt;Your Secret Access Key&gt;');
+                </pre>
+            </ul>
+            <br/>
+            <br/>
+            <ul>
+                <li>Open  CreateDomainSample.php sample, and find part:</li>
+                <pre>
+ // @TODO: set request. Action can be passed as Amazon_SimpleDB_Model_CreateDomainRequest
+ // object or array of parameters
+ // invokeCreateDomain($service, $request);
+                </pre>
+            </ul>
+            <br/>
+            <br/>
+            <ul>
+                <li>And set DomainName parameter:</li>
+
+                <pre>
+ invokeCreateDomain($service, array('DomainName' => 'MyDomain'));
+                </pre>
+
+            </ul>
+            <br/>
+
+            <li>Run CreateDomain sample:</li>
+            <pre>
+   php CreateDomainSample.php
+            </pre>
+
+            <li>You should see the output
+            similar to the following:</li>
+            <br/>
+            <br/>
+            <pre>
+    CreateDomainResponse
+        ResponseMetadata
+            RequestId
+                95cdcb68-f46c-400b-8265-8c2de2a5c475
+            </pre>
+            <br/>
+            <li>Experiment with samples. When ready, install library to your php include path and use it <p/></li>
+        </ol>
+
+        <p/>
+        <strong>Happy coding!</strong>
+        <h2>Comments, Questions or Feedback</h2>
+
+        If you have any comments, questions or feedback on the library, please visit the <a href="http://developer.amazonwebservices.com/connect/forum.jspa?forumID=38">Amazon SimpleDB discussion forums</a>.
+
+    </body>
+</html>

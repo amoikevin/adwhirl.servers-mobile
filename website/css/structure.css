@@ -1,0 +1,80 @@
+/*
+ -----------------------------------------------------------------------
+Copyright 2009 AdMob, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+------------------------------------------------------------------------
+*/
+/* - - - - - - - - - - - - - - - - - - - - -
+
+Title : Wufoo Form Structure
+Author : Infinity Box Inc.
+URL : http://wufoo.com
+
+Last Updated : September 30, 2008
+
+- - - - - - - - - - - - - - - - - - - - - */
+
+#wufooshell{
+	background:#eee;
+	margin:7px 0 15px 0;
+	text-align:center;
+	font-size:small;
+	font-family:"Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+}
+
+#container{
+	text-align:left;
+	background:#fff;
+}
+#container, #top, #bottom{
+	margin:0 auto;
+	width:900px;
+}
+
+#top, #bottom{
+	width:910px;
+	height:10px !important;
+	display:block !important;
+}
+#top{
+	margin-top:10px;
+}
+
+form.wufoo{
+	margin:20px 20px 0 20px;
+	padding:0 0 20px 0;
+}
+
+#leftPan{width:254px; float:left;}
+
+#rightPan{width:254px; float:left;}
+
+#navlist li { list-style-type: square; }
+
+
+#setup_container {
+border:1px solid #CCCCCC;
+background-color:#FFFFFF;
+margin:0 auto;
+width:990px;
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#FFFFFF none repeat scroll 0 0;
+text-align:left;
+}
+
+#appForm {
+    width: 900px;
+}

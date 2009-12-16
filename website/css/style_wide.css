@@ -1,0 +1,79 @@
+/*
+ -----------------------------------------------------------------------
+Copyright 2009 AdMob, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+------------------------------------------------------------------------
+*/
+/* CSS Document */
+body{margin:0; padding:0; background:url(../images/mainbg.gif) 0 0 repeat-x #fff; font:14px/18px Georgia, "Times New Roman", Times, serif; color:#666;}
+div, p, ul, h1, h2, h3, h4, form{margin:0px; padding:0px;}
+ul{list-style-type:none;}
+
+a {
+	text-decoration:none;
+	color:#0099cc;
+}
+a.delete {
+	text-decoration:none;
+	color:#990000;
+}
+a:hover {
+	text-decoration:underline;
+}
+
+
+/*--Login Info--*/
+#loginInfo{position:absolute; top:0px; right:35px; display:block; float:right; padding:0;}
+
+/*--Top Panel--*/
+#topPan{width:960px; height:104px; position:relative; margin:0 auto; padding:0;}
+#topPan h1{width:424px; height:215px; position:absolute; top:83px; left:0px; display:block; background:url(../images/header.jpg) 0 0 no-repeat #FEFFFE; font:24px/18px "Trebuchet MS",Arial, Helvetica, sans-serif; color:#fff; padding:65px 86px 0 450px; font-weight:normal;}
+#topPan h1 span{font-size:14px;}
+
+#topPan img{width:265px; height:39px; display:block; position:absolute; top:39px; left:0px;}
+
+#topPan ul{width:450px; height:27px; position:absolute; top:47px; left:551px;}
+#topPan ul li{float:left; width:102px; height:27px; display:block;}
+#topPan ul li a{display:block; width:102px; height:27px; background:#66ccff; color:#fff; font:13px/27px Arial, Helvetica, sans-serif; text-decoration:none; font-weight:bold; text-align:center;}
+#topPan ul li a:hover{background:url(../images/bullet1.gif) 50% 0 no-repeat #66ccff; color:#fff; text-decoration:none;}
+#topPan ul li.company{background:url(../images/bullet1.gif) 50% 0 no-repeat #66ccff; color:#fff; text-decoration:none; font:13px/27px Arial, Helvetica, sans-serif; font-weight:bold; text-align:center;}
+/*--/Top Panel--*/
+
+
+/*--/App Form START--*/
+#appForm{width:960px; height:44px; position:relative; margin:0 auto; padding:0;}
+#appForm form{width: 90%; margin-left: auto; margin-right: auto; background:#fff; color:#3B3B3B;}
+/*--/App Form END--*/
+
+
+/*--Lower Panel--*/
+#mainlowerPan{min-height:680px; background:url(../images/middlepanbg.gif) 0 0 repeat-x #F0F0F0; color:#666; padding:0 0 0;}
+#lowerPan{width:960px; position:relative; margin:0 auto;}
+/*--/Lower Panel--*/
+
+
+/*---FOOTER PANEL--*/
+#footermainPan{height:36px; background:#fff; color:#fff; margin:0; padding:0; clear:both;}
+#footerPan{width:960px; position:relative; margin:0 auto;}
+#footerPan img{width:248px; height:28px; position:absolute; top:23px; right:6px;}
+
+#footerPan ul{width:500px; position:absolute; top:12px; left:49px;}
+#footerPan li{float:left; font:12px/15px "Trebuchet MS",Arial, Helvetica, sans-serif; font-weight:normal;}
+#footerPan ul li a{padding:0 0 0 12px; color:#777777; background:#fff; text-decoration:none;}
+#footerPan ul li a:hover{text-decoration:underline;}
+
+#footerPan ul.templateworld{width:158px; background:#7D7D7D; color:#fff; display:block; position:absolute; top:120px; left:61px;}
+#footerPan ul.templateworld li a{background:#7D7D7D; display:block; color:#fff; text-decoration:none;}
+#footerPan ul.templateworld li a:hover{text-decoration:underline;}
+

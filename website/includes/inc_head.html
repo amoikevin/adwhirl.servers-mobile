@@ -1,0 +1,73 @@
+<?php
+/*
+ -----------------------------------------------------------------------
+Copyright 2009 AdMob, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+------------------------------------------------------------------------
+*/
+?>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-8105904-1");
+pageTracker._trackPageview();
+} catch(err) {}
+</script>
+</head>
+
+
+<?
+$uid = isset($_SESSION['UID']) ? $_SESSION['UID'] : null;
+?>
+
+<body>
+<!--Top Panel-->
+  <div id="topPan">
+  	<?php if(isset($_SESSION['UID'])) { ?>
+  	<div id="loginInfo"><?=$email?> | <a href="account"><small>my account</small></a> | <a href="logout"><small>log out</small></a></div>
+  	<?php } ?>
+  	<a href="index"><img src="http://adrollo-images.s3.amazonaws.com/logo_adwhirl.gif" title="Mobile Advertising | iPhone | Monetize Traffic | AdWhirl" alt="Mobile Advertising | iPhone | Monetize Traffic | AdWhirl" width="265" height="39" border="0" /></a>
+<?
+
+$request_uri = $_SERVER['REQUEST_URI'];
+
+$home_class = '';
+$get_class = '';
+$help_class = '';
+$blog_class = '';
+
+if(strpos($request_uri, "main") != false)
+   $home_class = ' class="company"';
+else if(strpos($request_uri, "get") != false)
+   $get_class = ' class="company"';
+else if(strpos($request_uri, "help") != false)
+   $help_class = ' class="company"';
+else if(strpos($request_uri, "blog") != false)
+   $blog_class = ' class="company"';
+?>
+
+	<ul>
+
+<?php if(isset($_SESSION['UID'])) { ?>
+		<li<?= $home_class ?>><a href="main">My AdWhirl</a></li>
+<? } ?>
+		<li<?= $get_class ?>><a href="get">Instructions</a></li>
+		<li<?= $help_class ?>><a href="help">FAQs</a></li>
+		<li<?= $blog_class ?>><a href="blog">Blog</a></li>
+	</ul>
+  </div>
+<!--Top Panel Close-->

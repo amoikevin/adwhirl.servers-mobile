@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>http://www.adwhirl.com/</loc>
+  <priority>1.00</priority>
+  <lastmod>2009-04-24T22:58:42+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/index</loc>
+  <priority>0.80</priority>
+  <lastmod>2009-04-24T22:58:42+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/developers</loc>
+  <priority>0.80</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/help</loc>
+  <priority>0.80</priority>
+  <lastmod>2009-04-23T23:00:43+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/instructions</loc>
+  <priority>0.80</priority>
+  <lastmod>2009-04-23T23:00:37+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/forgotPass</loc>
+  <priority>0.80</priority>
+  <lastmod>2009-04-23T23:00:43+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/developers</loc>
+  <priority>0.80</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/tos</loc>
+  <priority>0.64</priority>
+  <lastmod>2009-04-23T23:00:42+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/privacy</loc>
+  <priority>0.64</priority>
+  <lastmod>2009-04-23T23:00:40+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.adwhirl.com/index</loc>
+  <priority>0.64</priority>
+  <lastmod>2009-04-24T22:58:42+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+</urlset>
