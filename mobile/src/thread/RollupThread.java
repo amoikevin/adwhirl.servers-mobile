@@ -25,14 +25,11 @@ import com.amazonaws.sdb.model.ReplaceableAttribute;
 import com.amazonaws.sdb.model.SelectRequest;
 import com.amazonaws.sdb.model.SelectResponse;
 import com.amazonaws.sdb.model.SelectResult;
-import com.amazonaws.sdb.util.AmazonSimpleDBUtil;
 
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -63,18 +60,19 @@ public class RollupThread implements Runnable {
 			
 			//TODO: change this
 			try {
-				Thread.sleep(60000);
+				Thread.sleep(5 * 60000);
 			} catch (InterruptedException e) {
 				log.error("Unable to sleep... continuing");
 			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void processHitsCache() {
 		log.debug("Processing hitsCache");
-		Iterator it = MetricsServlet.hitsCache.getKeys().iterator();
+		Iterator<String> it = (Iterator<String>) MetricsServlet.hitsCache.getKeys().iterator();
 		while(it.hasNext()) {
-			String nid = (String)it.next();
+			String nid = it.next();
 			
 			Element element = MetricsServlet.hitsCache.get(nid);
 			if(element != null) {
@@ -84,11 +82,12 @@ public class RollupThread implements Runnable {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void processLegacyHitsCache() {
 		log.debug("Processing legacyHitsCache");
-		Iterator it = MetricsServlet.legacyHitsCache.getKeys().iterator();
+		Iterator<String> it = MetricsServlet.legacyHitsCache.getKeys().iterator();
 		while(it.hasNext()) {
-			String key = (String)it.next();
+			String key = it.next();
 			
 			int index = key.indexOf("_");
 			if(index == -1) {
@@ -113,7 +112,6 @@ public class RollupThread implements Runnable {
 
 				for(Item item : list) {		
 					nid = item.getName();
-					System.out.println("GOT NAME: " + nid);
 				}
 			}
 			catch(AmazonSimpleDBException e) {
@@ -127,7 +125,6 @@ public class RollupThread implements Runnable {
 				updateSimpleDB(nid, ho);
 			}
 			else {
-				log.error("No value found for key=\"" + key + "\"");
 				continue;
 			}
 		}
@@ -172,20 +169,10 @@ public class RollupThread implements Runnable {
 		
 		List<ReplaceableAttribute> list2 = new ArrayList<ReplaceableAttribute>();
 		list2.add(new ReplaceableAttribute("aid", ho.aid, false));
-		list2.add(new ReplaceableAttribute("dateTime", dateTimeDetail, false));
+		list2.add(new ReplaceableAttribute("dateTime", dateTimeDetail, true));
 		putItem(AdWhirlUtil.DOMAIN_STATS_INVALID, nid, list2);
 	}
 
-	private static Date startOfDay(Date date) {
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-		return calendar.getTime();
-	}
-	
 	private void putItem(String domain, String item, List<ReplaceableAttribute> list) {
 		log.debug("Putting Amazon SimpleDB item: " + item);
 		PutAttributesRequest request = new PutAttributesRequest().withDomainName(domain).withItemName(item);

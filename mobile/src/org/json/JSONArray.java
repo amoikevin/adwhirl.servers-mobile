@@ -191,7 +191,8 @@ public class JSONArray {
      * @throws JSONException If not an array.
      */
 
-    public JSONArray(Collection collection, boolean includeSuperClass) {
+    @SuppressWarnings("unchecked")
+	public JSONArray(Collection collection, boolean includeSuperClass) {
 		this.myArrayList = new ArrayList<Object>();
 		if (collection != null) {
 			Iterator iter = collection.iterator();;
@@ -685,6 +686,7 @@ public class JSONArray {
      * @param value A Map value.
      * @return      this.
      */
+    @SuppressWarnings("unchecked")
     public JSONArray put(Map value) {
         put(new JSONObject(value));
         return this;
@@ -789,6 +791,7 @@ public class JSONArray {
      * @throws JSONException If the index is negative or if the the value is
      *  an invalid number.
      */
+    @SuppressWarnings("unchecked")
     public JSONArray put(int index, Map value) throws JSONException {
         put(index, new JSONObject(value));
         return this;

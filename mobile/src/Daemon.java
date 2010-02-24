@@ -16,6 +16,7 @@ limitations under the License.
 
 import org.apache.log4j.Logger;
 
+import thread.InvalidateDaemon;
 import thread.RollupDaemon;
 
 public class Daemon {
@@ -24,5 +25,8 @@ public class Daemon {
 	public static void main(String[] args) {
 		Thread rollupDaemon = new Thread(new RollupDaemon());
 		rollupDaemon.start();	
+		
+		Thread invalidateDaemon = new Thread(new InvalidateDaemon());
+		invalidateDaemon.start();	
 	}
 }

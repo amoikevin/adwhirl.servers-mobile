@@ -22,9 +22,9 @@ public class Extra {
     private int adsOn;
 	
     private String fgColor = "FFFFFF";
-    private int fg_red = 256;
-    private int fg_green = 256;
-    private int fg_blue = 256;
+    private int fg_red = 255;
+    private int fg_green = 255;
+    private int fg_blue = 255;
     private int fg_alpha = 1;
 	
     private String bgColor = "000000";
@@ -32,7 +32,7 @@ public class Extra {
     private int bg_green = 0;
     private int bg_blue = 0;
     private int bg_alpha = 1;
-	
+
     private int cycleTime = 30;
     private int locationOn = 1;
     private int transition = 1;
@@ -46,23 +46,33 @@ public class Extra {
     public void setFgColor(String fgColor) {
 	this.fgColor = fgColor;
 		
-	int rgb = Integer.decode("#" + fgColor);
-	Color c = new Color(rgb);
-	this.fg_red = c.getRed();
-	this.fg_green = c.getGreen();
-	this.fg_blue = c.getBlue();
-	this.fg_alpha = 1;
+	try {
+		int rgb = Integer.decode("#" + fgColor);
+		Color c = new Color(rgb);
+		this.fg_red = c.getRed();
+		this.fg_green = c.getGreen();
+		this.fg_blue = c.getBlue();
+		this.fg_alpha = 1;
+	}
+	catch(NumberFormatException e) {
+		// Do nothing, we already have defaults
+	}
     }	
 	
     public void setBgColor(String bgColor) {
 	this.bgColor = bgColor;
 		
+	try {
 	int rgb = Integer.decode("#" + bgColor);
 	Color c = new Color(rgb);
 	this.bg_red = c.getRed();
 	this.bg_green = c.getGreen();
 	this.bg_blue = c.getBlue();
 	this.bg_alpha = 1;
+	}
+	catch(NumberFormatException e) {
+		// Do nothing, we already have defaults
+	}
     }
 
     public int getAdsOn() {

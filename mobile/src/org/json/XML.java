@@ -339,6 +339,7 @@ public class XML {
      * @return A string.
      * @throws JSONException
      */
+    @SuppressWarnings("unchecked")
     public static String toString(Object o, String tagName)
             throws JSONException {
         StringBuffer b = new StringBuffer();

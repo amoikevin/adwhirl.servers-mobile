@@ -16,7 +16,6 @@ limitations under the License.
 
 package servlet;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletConfig;
@@ -26,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 
 import thread.RollupThread;
 import util.AdWhirlUtil;
@@ -44,10 +42,9 @@ public class MetricsServlet extends HttpServlet
 	
     public static Cache hitsCache;
     public static Cache legacyHitsCache;
+    public static Thread rollupThread;
 	
     public void init(ServletConfig servletConfig) throws ServletException {
-	log.setLevel(Level.FATAL);
-
 	CacheManager.create();
 		
 	hitsCache = CacheManager.getInstance().getCache("hitsCache");
@@ -62,9 +59,23 @@ public class MetricsServlet extends HttpServlet
 	    System.exit(0);
 	}
 
-	Thread rollupThread = new Thread(new RollupThread());
+	rollupThread = new Thread(new RollupThread());
 	rollupThread.start();	
-		
+	
+	Runtime.getRuntime().addShutdownHook(new Thread() {
+		public void run() {
+		    log.fatal("Attempting to flush cache before exiting...");
+		    rollupThread.interrupt();
+		    log.fatal("Sleeping 10 seconds and quitting.");
+
+		    try {
+			Thread.sleep(10 * 1000);
+		    } catch (InterruptedException e) {
+			log.fatal("Unable to sleep.");
+		    }
+		}
+	});
+	
 	log.info("Servlet initialized completed");
     }
 	
@@ -106,6 +117,7 @@ public class MetricsServlet extends HttpServlet
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required");
 	    return;
 	}	
+	aid = aid.trim();
 		
 	Element element = null;
 
@@ -124,7 +136,6 @@ public class MetricsServlet extends HttpServlet
 		return;
 	    }			
 	    type = Integer.parseInt(s_type);
-
 
 	    //The NID variable here is a UUID identifying the network specific to the application
 	    String nid = request.getParameter("nid");

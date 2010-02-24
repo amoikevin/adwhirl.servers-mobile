@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 
 public class HealthCheckServlet extends HttpServlet {
     private static final long serialVersionUID = 4298132357865054869L;
@@ -34,8 +33,6 @@ public class HealthCheckServlet extends HttpServlet {
     static Logger log = Logger.getLogger("HealthCheckServlet");
 	 
     public void init(ServletConfig servletConfig) throws ServletException {
-	log.setLevel(Level.FATAL);
-		
 	log.info("Servlet initialized completed");
     }
 	

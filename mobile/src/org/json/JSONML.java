@@ -317,6 +317,7 @@ public class JSONML {
      * @return An XML string.
      * @throws JSONException
      */
+    @SuppressWarnings("unchecked")
     public static String toString(JSONArray ja) throws JSONException {
     	Object		 e;
     	int			 i;
@@ -399,6 +400,7 @@ public class JSONML {
      * @return An XML string.
      * @throws JSONException
      */
+    @SuppressWarnings("unchecked")
 	public static String toString(JSONObject jo) throws JSONException {
 	    StringBuffer sb = new StringBuffer();
 	    Object		 e;

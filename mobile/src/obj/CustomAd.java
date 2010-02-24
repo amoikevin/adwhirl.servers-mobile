@@ -17,6 +17,7 @@
 package obj;
 
 public class CustomAd {
+	private String aid = "";
     private String nid = "";
     private int type = 2;
     private String imageLink = "";
@@ -24,12 +25,16 @@ public class CustomAd {
     private String name = "";
     private String description = "";
     private String linkType = "";
-    private String linkShare = "";
+    private String launchType = "";
 
     public CustomAd(String nid) {
 	this.nid = nid;
     }
 	
+    public String getAid() {
+    	return aid;
+    }
+    
     public String getDescription() {
 	return description;
     }
@@ -39,11 +44,11 @@ public class CustomAd {
     public String getLink() {
 	return link;
     }
-    public String getLinkShare() {
-	return linkShare;
-    }
     public String getLinkType() {
 	return linkType;
+    }
+    public String getLaunchType() {
+	return launchType;
     }
     public String getName() {
 	return name;
@@ -55,6 +60,10 @@ public class CustomAd {
 	return type;
     }
 	
+    public void setAid(String aid) {
+    	this.aid = aid;
+    }
+    
     public void setDescription(String description) {
 	this.description = description;
     }
@@ -64,11 +73,11 @@ public class CustomAd {
     public void setLink(String link) {
 	this.link = link;
     }
-    public void setLinkShare(String linkShare) {
-	this.linkShare = linkShare;
-    }
     public void setLinkType(String linkType) {
 	this.linkType = linkType;
+    }
+    public void setLaunchType(String launchType) {
+	this.launchType = launchType;
     }
     public void setName(String name) {
 	this.name = name;

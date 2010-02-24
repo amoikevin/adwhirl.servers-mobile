@@ -12,19 +12,17 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 
 package servlet;
 
 import com.amazonaws.sdb.AmazonSimpleDB;
 import com.amazonaws.sdb.AmazonSimpleDBClient;
 import com.amazonaws.sdb.AmazonSimpleDBException;
-import com.amazonaws.sdb.model.Attribute;
 import com.amazonaws.sdb.model.Item;
 import com.amazonaws.sdb.model.SelectRequest;
 import com.amazonaws.sdb.model.SelectResponse;
 import com.amazonaws.sdb.model.SelectResult;
-import com.amazonaws.sdb.util.AmazonSimpleDBUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -42,618 +40,165 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
 
-import org.json.JSONException;
-import org.json.JSONStringer;
-import org.json.JSONWriter;
-import obj.Extra;
-import obj.Ration;
+import org.mortbay.jetty.servlet.*;
 
+import thread.CacheConfigLoaderThread;
+import thread.InvalidateConfigsThread;
 import util.AdWhirlUtil;
+import util.CacheUtil;
 
 public class ConfigServlet extends HttpServlet {
     private static final long serialVersionUID = 7298139537865054861L;
-	 
+    
     static Logger log = Logger.getLogger("ConfigServlet");
-	 
-    //We only want one instance of the cache and db client per instance
-    private static Cache cache;
-    private static AmazonSimpleDB sdb;
 	
-    public void init(ServletConfig servletConfig) throws ServletException {
-	log.setLevel(Level.FATAL);
+	private Context servletContext;
 
-	CacheManager.create();
-		
-	//TODO: Change cache settings according to your needs
-	String cacheName = "json_configs";
-	cache = CacheManager.getInstance().getCache(cacheName);
-	if(cache == null) {
-	    log.fatal("Unable to initialize cache \"" + cacheName + "\"");
-	    System.exit(0);
-	}
-		
-	sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
-		
-	log.info("Servlet initialized completed");
-    }
-	
-    protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-	String aid = httpServletRequest.getParameter("appid");
-	if(aid == null || aid.isEmpty()) {	
-	    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required.");
-	    return;
-	}		
-		
-	String s_appver = httpServletRequest.getParameter("appver");
-	int appver;
-	if(s_appver == null || s_appver.isEmpty()) {	
-	    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appver> is required.");
-	    return;
+	//We only want one instance of the cache and db client per instance
+	private static Cache cache;
+	private static AmazonSimpleDB sdb;
+
+	public ConfigServlet(Context servletContext) {
+		this.servletContext = servletContext;
 	}
 
-	try {
-	    appver = Integer.parseInt(s_appver);
-	}
-	catch(java.lang.NumberFormatException e) {
-	    s_appver = s_appver.replace(".", "");
+	public void init(ServletConfig servletConfig) throws ServletException {
+		CacheManager.create();
 
-	    appver = Integer.parseInt(s_appver);
+		//TODO: Change cache settings according to your needs
+		String cacheName = "json_configs";
+		cache = CacheManager.getInstance().getCache(cacheName);
+		if(cache == null) {
+			log.fatal("Unable to initialize cache \"" + cacheName + "\"");
+			System.exit(0);
+		}
+
+		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
+
+//		preloadConfigs();
+
+		log.info("Config Servlet initialized completed, loading other servlets...");
+
+		servletContext.addServlet(new ServletHolder(new	AdrolloServlet()), "/adrollo.php");
+		servletContext.addServlet(new ServletHolder(new	CustomsServlet()), "/custom.php");
+
+		ServletHolder metricsServletHolder = new ServletHolder(new MetricsServlet());
+		servletContext.addServlet(metricsServletHolder, "/exmet.php");
+		servletContext.addServlet(metricsServletHolder, "/exclick.php");
+
+		servletContext.addServlet(new ServletHolder(new	HealthCheckServlet()), "/ping");
+		
+	    Thread invalidater = new Thread(new InvalidateConfigsThread(cache));
+	    invalidater.start();
 	}
+
+	private void preloadConfigs() {
+		List<Thread> threads = new ArrayList<Thread>();
 		
-	//The response varies between versions, so we use a composite key
-	String key = appver + "_" + aid;
-	Element cachedConfig = cache.get(key);
-		
-	String jsonConfig = null;
-		
-	if(cachedConfig != null) {
-	    log.debug("Cache hit on \"" + key + "\"");
-	    jsonConfig = (String)cachedConfig.getObjectValue();
-	}
-	else {
-	    log.debug("Cache miss on \"" + key + "\"");
-			
-	    Extra extra = new Extra();
-			
-	    //First we pull the general configuration information
-	    SelectRequest request = new SelectRequest("select `adsOn`, `locationOn`, `fgColor`, `bgColor`, `cycleTime`, `transition` from `" + AdWhirlUtil.DOMAIN_APPS + "` where itemName() = '" + aid + "' limit 1", null);
-	    try {
-		SelectResponse response = sdb.select(request);
-		SelectResult result = response.getSelectResult();
-		List<Item> itemList = result.getItem();
-				
-		items_loop:
-		for(Item item : itemList) {
-		    int locationOn = 0;
-		    String bgColor = null;
-		    String fgColor = null;
-		    int cycleTime = 30000;
-		    int transition = 0;
-					
-		    List<Attribute> attributeList = item.getAttribute();
-		    for(Attribute attribute : attributeList) {
-			if(!attribute.isSetName()) {
-			    continue;						
+		int threadId = 1;
+		String appsNextToken = null;
+	    do {
+			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`", appsNextToken);
+			try {
+			    SelectResponse appsResponse = sdb.select(appsRequest);
+			    SelectResult appsResult = appsResponse.getSelectResult();
+			    appsNextToken = appsResult.getNextToken();
+			    List<Item> appsList = appsResult.getItem();
+				    
+			    Thread thread = new Thread(new CacheConfigLoaderThread(cache, appsList, threadId++));
+			    threads.add(thread);
+			    thread.start();
 			}
-						
-			String attributeName = attribute.getName();
-			if(attributeName.equals("adsOn")) {
-			    if(attribute.isSetValue()) {
-				int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-				extra.setAdsOn(adsOn);
-			    }
-			}
-			else if(attributeName.equals("locationOn")) {
-			    if(attribute.isSetValue()) {
-				locationOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-				extra.setLocationOn(locationOn);
-			    }
-			}
-			else if(attributeName.equals("fgColor")) {
-			    if(attribute.isSetValue()) {
-				fgColor = attribute.getValue();
-				extra.setFgColor(fgColor);
-			    }
-			}
-			else if(attributeName.equals("bgColor")) {
-			    if(attribute.isSetValue()) {
-				bgColor = attribute.getValue();
-				extra.setBgColor(bgColor);
-			    }
-			}
-			else if(attributeName.equals("cycleTime")) {
-			    if(attribute.isSetValue()) {
-				cycleTime = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-				extra.setCycleTime(cycleTime);
-			    }
-			}
-			else if(attributeName.equals("transition")) {
-			    if(attribute.isSetValue()) {
-				transition = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-				extra.setTransition(transition);
-			    }
-			}
-			else {
-			    log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
-			}
+			catch(AmazonSimpleDBException e) {
+			    log.error("Error querying SimpleDB: " + e.getMessage());
 		    }
-
-		    //Now we pull the information about the app's nids
-		    SelectRequest networksRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "'", null);
-		    SelectResponse networksResponse = sdb.select(networksRequest);
-		    SelectResult networksResult = networksResponse.getSelectResult();
-		    List<Item> networksList = networksResult.getItem();
-					
-		    List<Ration> rations = new ArrayList<Ration>();
-					
-		    networks_loop:
-		    for(Item network : networksList) {
-			String nid = network.getName();
-						
-			Ration ration = new Ration(nid);
-						
-			List<Attribute> networkAttributeList = network.getAttribute();
-			for(Attribute networkAttribute : networkAttributeList) {
-			    if(!networkAttribute.isSetName()) {
-				continue;						
-			    }
-							
-			    String networkAttributeName = networkAttribute.getName();
-			    if(networkAttributeName.equals("adsOn")) {
-				if(networkAttribute.isSetValue()) {
-				    int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue());
-				    if(adsOn == 0) {
-					//We don't care about reporting back a network that isn't active
-					continue networks_loop;
-				    }
-				}
-			    }
-			    else if(networkAttributeName.equals("type")) {
-				if(networkAttribute.isSetValue()) {
-				    ration.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
-				}
-			    }
-			    else if(networkAttributeName.equals("weight")) {
-				if(networkAttribute.isSetValue()) {
-				    ration.setWeight(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
-				}
-			    }								
-			    else if(networkAttributeName.equals("priority")) {
-				if(networkAttribute.isSetValue()) {
-				    ration.setPriority(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
-				}
-			    }								
-			    else if(networkAttributeName.equals("key")) {
-				if(networkAttribute.isSetValue()) {
-				    ration.setNetworkKey(networkAttribute.getValue());
-				}
-			    }
-			    else {
-				log.info("SELECT request pulled an unknown attribute: " + networkAttributeName + "|" + networkAttribute.getValue());
-			    }
+	    }
+	    while(appsNextToken != null);
+	    
+	    for(Thread thread : threads) {
+	    	try {
+				thread.join();
+			} catch (InterruptedException e) {
+				log.error("Caught exception while joining preload threads", e);
 			}
+	    }
+	}
 
-			rations.add(ration);
-		    }	
-					
-		    try {
-			jsonConfig = genJsonConfig(appver, extra, rations);
-			log.debug("jsonConfig for \"" + key + "\": " + jsonConfig);
-		    } catch (JSONException e) {
-			log.error("Error creating jsonConfig: " + e.getMessage());
+	private void loadApp(String aid) {
+		CacheUtil cacheUtil = new CacheUtil();
+		cacheUtil.loadApp(cache, aid);
+	}
+
+	protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+		String aid = httpServletRequest.getParameter("appid");
+		if(aid == null || aid.isEmpty()) {	
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required.");
 			return;
-		    }
-		} 
-	    }
-	    catch (AmazonSimpleDBException e) {
-		log.error("Error querying SimpleDB: " + e.getMessage());
-		return;
-	    }	
-			
-	    cache.put(new Element(key, jsonConfig));
-	}
+		}		
+		aid = aid.trim();
 
-	//For better security against XSS, prefer application/json over text/html
-	httpServletResponse.setContentType("application/json");
-	PrintWriter out = httpServletResponse.getWriter();
-	if(jsonConfig == null) {
-	    out.print("[]");
-	}
-	else {
-	    out.print(jsonConfig);
-	}
-	out.close();	
-    }
-	
-    private String genJsonConfig(int appver, Extra extra, List<Ration> rations) throws JSONException {
-	if(appver == 200) 
-	    return genJsonConfigV200(extra, rations);
-	else if(appver > 103) 
-	    return genJsonConfigV127(extra, rations);
-	else if(appver > 0)
-	    return genJsonConfigV103(extra, rations);
-	else
-	    throw new JSONException("Invalid version, unable to create JSON string!");
-    }
-	
-    private String genJsonConfigV200(Extra extra, List<Ration> rations) throws JSONException {		
-	JSONWriter jsonWriter = new JSONStringer();
-
-	if(extra.getAdsOn() == 0) {
-	    return jsonWriter.object()
-		.key("rations")
-		.array()
-		.endArray()
-		.endObject()
-		.toString();
-	}
-
-	jsonWriter = jsonWriter.object()
-	    .key("extra")
-	    .object()
-	    .key("location_on")
-	    .value(extra.getLocationOn())
-	    .key("background_color_rgb")
-	    .object()
-	    .key("red")
-	    .value(extra.getBg_red())
-	    .key("green")
-	    .value(extra.getBg_green())
-	    .key("blue")
-	    .value(extra.getBg_blue())
-	    .key("alpha")
-	    .value(extra.getBg_alpha())
-	    .endObject()
-	    .key("text_color_rgb")
-	    .object()
-	    .key("red")
-	    .value(extra.getFg_red())
-	    .key("green")
-	    .value(extra.getFg_green())
-	    .key("blue")
-	    .value(extra.getFg_blue())
-	    .key("alpha")
-	    .value(extra.getFg_alpha())
-	    .endObject()
-	    .key("cycle_time")
-	    .value(extra.getCycleTime())
-	    .key("transition")
-	    .value(extra.getTransition())
-	    .endObject();
-
-	jsonWriter = jsonWriter.key("rations")
-	    .array();
-
-	for(Ration ration : rations) {
-	    jsonWriter = jsonWriter.object()
-		.key("nid")
-		.value(ration.getNid())
-		.key("type")
-		.value(ration.getType())
-		.key("nname")
-		.value(ration.getNName())
-		.key("weight")
-		.value(ration.getWeight())
-		.key("priority")
-		.value(ration.getPriority())
-		.key("key");
-
-	    if(ration.getType() == AdWhirlUtil.NETWORKS.VIDEOEGG.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		jsonWriter = jsonWriter.object()
-		    .key("publisher")
-		    .value(temp[0])
-		    .key("area")
-		    .value(temp[1])
-		    .endObject();
-	    }
-	    else if(ration.getType() == AdWhirlUtil.NETWORKS.QUATTRO.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		jsonWriter = jsonWriter.object()
-		    .key("siteID")
-		    .value(temp[0])
-		    .key("publisherID")
-		    .value(temp[1])
-		    .endObject();
-	    }
-	    else if(ration.getType() == AdWhirlUtil.NETWORKS.MOBCLIX.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		jsonWriter = jsonWriter.object()
-		    .key("appID")
-		    .value(temp[0])
-		    .key("adCode")
-		    .value(temp[1])
-		    .endObject();
-	    }
-	    else {
-		jsonWriter = jsonWriter.value(ration.getNetworkKey());
-	    }
-
-	    jsonWriter = jsonWriter.endObject();
-	}
-
-	jsonWriter = jsonWriter.endArray();
-		
-	return jsonWriter.endObject().toString();
-    }
-
-    //Legacy support
-    private String genJsonConfigV127(Extra extra, List<Ration> rations) throws JSONException {
-	JSONWriter jsonWriter = new JSONStringer();
-
-	jsonWriter = jsonWriter.array();
-
-	if(extra.getAdsOn() == 0) {
-	    jsonWriter = jsonWriter.object()
-		.key("empty_ration")
-		.value(100)
-		.endObject()
-		.object()
-		.key("empty_ration")
-		.value("empty_ration")
-		.endObject()
-		.object()
-		.key("empty_ration")
-		.value(1)
-		.endObject();
-	}
-	else {
-	    jsonWriter = jsonWriter.object();
-	    int customWeight = 0;
-	    for(Ration ration : rations) {
-		if(ration.getNName().equals("custom")) {
-		    customWeight += ration.getWeight();
-		    continue;
+		String s_appver = httpServletRequest.getParameter("appver");
+		int appver;
+		if(s_appver == null || s_appver.isEmpty()) {	
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appver> is required.");
+			return;
 		}
-			
-		jsonWriter = jsonWriter.key(ration.getNName() + "_ration")
-		    .value(ration.getWeight());
-					
-	    }
-	    if(customWeight != 0) {
-		jsonWriter = jsonWriter.key("custom_ration")
-		    .value(customWeight);
-	    }
-	    jsonWriter = jsonWriter.endObject();
-		
-	    jsonWriter = jsonWriter.object();
-	    for(Ration ration : rations) {			
-		if(ration.getNName().equals("custom")) {
-		    continue;
-		}
-		else if(ration.getType() == AdWhirlUtil.NETWORKS.VIDEOEGG.ordinal()) {
-		    String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
 
-		    jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-			.object()
-			.key("publisher")
-			.value(temp[0])
-			.key("area")
-			.value(temp[1])
-			.endObject();
+		try {
+			appver = Integer.parseInt(s_appver);
 		}
-		else if(ration.getType() == AdWhirlUtil.NETWORKS.QUATTRO.ordinal()) {
-		    String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
+		catch(java.lang.NumberFormatException e) {
+			s_appver = s_appver.replace(".", "");
 
-		    jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-			.object()
-			.key("siteID")
-			.value(temp[0])
-			.key("publisherID")
-			.value(temp[1])
-			.endObject();
+			appver = Integer.parseInt(s_appver);
 		}
-		else if(ration.getType() == AdWhirlUtil.NETWORKS.MOBCLIX.ordinal()) {
-		    String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
 
-		    jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-			.object()
-			.key("appID")
-			.value(temp[0])
-			.key("adCode")
-			.value(temp[1])
-			.endObject();
+		appver = cacheConfigVersion(appver);
+
+		//The response varies between versions, so we use a composite key
+		String key = aid + "_" + appver;
+		Element cachedConfig = cache.get(key);
+
+		String jsonConfig = null;
+
+		if(cachedConfig != null) {
+			log.debug("Cache hit on \"" + key + "\"");
+			jsonConfig = (String)cachedConfig.getObjectValue();
 		}
 		else {
-		    jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-			.value(ration.getNetworkKey());
-		}
-	    }
-
-	    if(customWeight != 0) {
-		jsonWriter = jsonWriter.key("dontcare_key")
-		    .value(customWeight);
-	    }
-	    jsonWriter = jsonWriter.endObject();
-		
-	    jsonWriter = jsonWriter.object();
-	    int customPriority = Integer.MAX_VALUE;
-	    for(Ration ration : rations) {
-		if(ration.getNName().equals("custom")) {
-		    if(customPriority > ration.getPriority()) {
-			customPriority = ration.getPriority();
-		    }
-		    continue;
-		}
+			log.debug("Cache miss on \"" + key + "\"");
+			loadApp(aid);
 			
-		jsonWriter = jsonWriter.key(ration.getNName() + "_priority")
-		    .value(ration.getPriority());
-	    }
-	    if(customWeight != 0) {
-		jsonWriter = jsonWriter.key("custom_priority")
-		    .value(customPriority);
-	    }
-	    jsonWriter = jsonWriter.endObject();
-	}
-
-	jsonWriter = jsonWriter.object()
-	    .key("background_color_rgb")
-	    .object()
-	    .key("red")
-	    .value(extra.getBg_red())
-	    .key("green")
-	    .value(extra.getBg_green())
-	    .key("blue")
-	    .value(extra.getBg_blue())
-	    .key("alpha")
-	    .value(extra.getBg_alpha())
-	    .endObject()
-	    .key("text_color_rgb")
-	    .object()
-	    .key("red")
-	    .value(extra.getFg_red())
-	    .key("green")
-	    .value(extra.getFg_green())
-	    .key("blue")
-	    .value(extra.getFg_blue())
-	    .key("alpha")
-	    .value(extra.getFg_alpha())
-	    .endObject()
-	    .key("refresh_interval")
-	    .value(extra.getCycleTime())
-	    .key("location_on")
-	    .value(extra.getLocationOn())
-	    .key("banner_animation_type")
-	    .value(extra.getTransition())
-	    .key("fullscreen_wait_interval")
-	    .value(extra.getFullscreen_wait_interval())
-	    .key("fullscreen_max_ads")
-	    .value(extra.getFullscreen_max_ads())
-	    .key("metrics_url")
-	    .value(extra.getMetrics_url())
-	    .key("metrics_flag")
-	    .value(extra.getMetrics_flag())
-	    .endObject();
-		
-	return jsonWriter.endArray().toString();
-    }
-
-    //Legacy support
-    private String genJsonConfigV103(Extra extra, List<Ration> rations) throws JSONException {
-	JSONWriter jsonWriter = new JSONStringer();
-
-	jsonWriter = jsonWriter.array();
-	jsonWriter = jsonWriter.object();
-	int customWeight = 0;
-	for(Ration ration : rations) {
-	    if(ration.getNName().equals("custom")) {
-		customWeight += ration.getWeight();
-		continue;
-	    }
-			
-	    jsonWriter = jsonWriter.key(ration.getNName() + "_ration")
-		.value(ration.getWeight());
-					
-	}
-	if(customWeight != 0) {
-	    jsonWriter = jsonWriter.key("custom_ration")
-		.value(customWeight);
-	}
-	jsonWriter = jsonWriter.endObject();
-		
-	jsonWriter = jsonWriter.object();
-	for(Ration ration : rations) {			
-	    if(ration.getNName().equals("custom")) {
-		continue;
-	    }
-	    else if(ration.getType() == AdWhirlUtil.NETWORKS.VIDEOEGG.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-		    .object()
-		    .key("publisher")
-		    .value(temp[0])
-		    .key("area")
-		    .value(temp[1])
-		    .endObject();
-	    }
-	    else if(ration.getType() == AdWhirlUtil.NETWORKS.QUATTRO.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-		    .object()
-		    .key("siteID")
-		    .value(temp[0])
-		    .key("publisherID")
-		    .value(temp[1])
-		    .endObject();
-	    }
-	    else {
-		jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-		    .value(ration.getNetworkKey());
-	    }
-	}
-
-	if(customWeight != 0) {
-	    jsonWriter = jsonWriter.key("dontcare_key")
-		.value(customWeight);
-	}
-	jsonWriter = jsonWriter.endObject();
-		
-	jsonWriter = jsonWriter.object();
-	int customPriority = Integer.MAX_VALUE;
-	for(Ration ration : rations) {
-	    if(ration.getNName().equals("custom")) {
-		if(customPriority > ration.getPriority()) {
-		    customPriority = ration.getPriority();
+			Element loadedConfig = cache.get(key);
+			if(loadedConfig == null) {
+				log.error("Unable to load application: " + aid);
+			}
+			else {
+				jsonConfig = (String)loadedConfig.getObjectValue();
+			}
 		}
-		continue;
-	    }
-			
-	    jsonWriter = jsonWriter.key(ration.getNName() + "_priority")
-		.value(ration.getPriority());
+
+		httpServletResponse.setCharacterEncoding("UTF-8");
+		httpServletResponse.setContentType("application/json");
+
+		PrintWriter out = httpServletResponse.getWriter();
+		if(jsonConfig == null) {
+			out.print("[]");
+		}
+		else {
+			out.print(jsonConfig);
+		}
+		out.close();	
 	}
-	if(customWeight != 0) {
-	    jsonWriter = jsonWriter.key("custom_priority")
-		.value(customPriority);
+
+	private int cacheConfigVersion(int appver) {
+		if(appver >= 200) 
+			return 200;
+		else if(appver > 103) 
+			return 127;
+		else 
+			return 103;
 	}
-	jsonWriter = jsonWriter.endObject();
-		
-	jsonWriter = jsonWriter.object()
-	    .key("background_color_rgb")
-	    .object()
-	    .key("red")
-	    .value(extra.getBg_red())
-	    .key("green")
-	    .value(extra.getBg_green())
-	    .key("blue")
-	    .value(extra.getBg_blue())
-	    .key("alpha")
-	    .value(extra.getBg_alpha())
-	    .endObject()
-	    .key("text_color_rgb")
-	    .object()
-	    .key("red")
-	    .value(extra.getFg_red())
-	    .key("green")
-	    .value(extra.getFg_green())
-	    .key("blue")
-	    .value(extra.getFg_blue())
-	    .key("alpha")
-	    .value(extra.getFg_alpha())
-	    .endObject()
-	    .key("refresh_interval")
-	    .value(extra.getCycleTime())
-	    .key("location_on")
-	    .value(extra.getLocationOn())
-	    .key("banner_animation_type")
-	    .value(extra.getTransition())
-	    .key("fullscreen_wait_interval")
-	    .value(extra.getFullscreen_wait_interval())
-	    .key("fullscreen_max_ads")
-	    .value(extra.getFullscreen_max_ads())
-	    .key("metrics_url")
-	    .value(extra.getMetrics_url())
-	    .key("metrics_flag")
-	    .value(extra.getMetrics_flag())
-	    .endObject();
-		
-	return jsonWriter.endArray().toString();
-    }
 }
 

@@ -46,9 +46,10 @@ limitations under the License.
     <pathelement location="lib/jaxb-api.jar"/>
     <pathelement location="lib/jaxb-impl.jar"/>
     <pathelement location="lib/jaxb-xjc.jar"/>
+    <pathelement location="lib/jetty-6.1.22.jar"/>
+    <pathelement location="lib/jetty-util-6.1.22.jar"/>
     <pathelement location="lib/jsr173_1.0_api.jar"/>
     <pathelement location="lib/log4j-1.2.14.jar"/>
-    <pathelement location="lib/org.mortbay.jetty.jar"/>
     <pathelement location="res/configs"/>
   </path>
 

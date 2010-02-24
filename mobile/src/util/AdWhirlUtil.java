@@ -19,18 +19,20 @@ package util;
 import com.amazonaws.sdb.AmazonSimpleDBConfig;
 
 public class AdWhirlUtil {
-    public static final String SERVER = "CHANGEME";
+    public static final String SERVER = "AdWhirlLB-473732162.us-east-1.elb.amazonaws.com";
 
     public static final String DOMAIN_APPS = "apps";
+    public static final String DOMAIN_APPS_INVALID = "apps_invalid";
     public static final String DOMAIN_NETWORKS = "networks";
     public static final String DOMAIN_CUSTOMS = "customs";
+    public static final String DOMAIN_CUSTOMS_INVALID = "customs_invalid";
     public static final String DOMAIN_STATS = "stats";
     public static final String DOMAIN_STATS_TEMP = "stats_temp";
     public static final String DOMAIN_STATS_INVALID = "stats_invalid";
     public static final String DOMAIN_USERS = "users";
     public static final String DOMAIN_USERS_FORGOT = "users_forgot";
     public static final String DOMAIN_USERS_UNVERIFIED = "users_unverified";
-	
+
     public static final String myAccessKey = "CHANGEME";
     public static final String mySecretKey = "CHANGEME";
 	
@@ -56,7 +58,8 @@ public class AdWhirlUtil {
 	    FOURTHSCREEN,
 	    GOOGLE_ADSENSE,
 	    GOOGLE_DOUBLECLICK,
-	    GENERIC
+	    GENERIC,
+	    EVENT
 	    }
 
     public static String getNetworkPrefix(int type) {
@@ -68,13 +71,13 @@ public class AdWhirlUtil {
 	case 3:
 	    return "videoegg";
 	case 4:
-	    return "medialets";	//was medialets
+	    return "medialets";
 	case 5:
-	    return "liverail";	//was liverail
+	    return "liverail";
 	case 6:
 	    return "millennial";
 	case 7:
-	    return "greystripe";	//was greystripe
+	    return "greystripe";
 	case 8:
 	    return "quattro";
 	case 9:
@@ -84,7 +87,7 @@ public class AdWhirlUtil {
 	case 11:
 	    return "mobclix";
 	case 12:
-	    return "adrollo";  //mdotm
+	    return "mdotm"; 
 	case 13:
 	    return "adrollo";  //4thscreen
 	case 14:
@@ -93,22 +96,32 @@ public class AdWhirlUtil {
 	    return "google_doubleclick";
 	case 16:
 	    return "generic";
+	case 17:
+	    return "event";
 	default:
 	    return "unknown";
 	}
     }
 	
     public enum HITTYPE {
+    	PADDING,
 	IMPRESSION,
 	    CLICK
 	    }
 	
+    public enum LAUNCH_TYPE {
+    	PADDING,
+    	LAUNCH_TYPE_SAFARI,
+    	LAUNCH_TYPE_CANVAS,
+    	LAUNCH_TYPE_LS
+    }
+    
     static {
 	//TODO: Read from config file
 		
 	config = new AmazonSimpleDBConfig();
 		
-	//TODO: Is this neccessary?
+	//TODO: What is this value?
 	config.setSignatureVersion("0");
     }
 }
