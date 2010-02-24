@@ -141,8 +141,8 @@ public class ConfigServlet extends HttpServlet {
 		String s_appver = httpServletRequest.getParameter("appver");
 		int appver;
 		if(s_appver == null || s_appver.isEmpty()) {	
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appver> is required.");
-			return;
+		    // Default to 127 if no version is passed in
+		    s_appver = "127";
 		}
 
 		try {
