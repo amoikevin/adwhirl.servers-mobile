@@ -19,6 +19,8 @@ package util;
 import com.amazonaws.sdb.AmazonSimpleDBConfig;
 
 public class AdWhirlUtil {
+    public static final int VERSION = 210;
+
     public static final String SERVER = "AdWhirlLB-473732162.us-east-1.elb.amazonaws.com";
 
     public static final String DOMAIN_APPS = "apps";
