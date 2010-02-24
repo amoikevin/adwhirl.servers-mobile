@@ -35,6 +35,8 @@ import net.sf.ehcache.Element;
 import obj.Ration;
 
 import org.apache.log4j.Logger;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -89,7 +91,7 @@ public class AdrolloServlet extends HttpServlet {
 			return;
 		}		
 
-		String clientIP = httpServletRequest.getRemoteAddr();
+		String clientIP = httpServletRequest.getHeader("X-Forwarded-For");
 
 		String key = aid;
 
@@ -127,30 +129,26 @@ public class AdrolloServlet extends HttpServlet {
 			}
 			in.close();
 
-			if(!mdotmJson.toString().isEmpty()) {
+			if(!mdotmJson.toString().isEmpty() && !mdotmJson.toString().equals("[]")) {
 				JSONObject adrolloResponse;
 				try {
-					adrolloResponse = new JSONObject(mdotmJson.toString());
+				    JSONArray adrolloArray = new JSONArray(mdotmJson.toString());
+				    adrolloResponse = adrolloArray.getJSONObject(0);
 
-					String img_url = (String)adrolloResponse.get("img_url");
+					String img_url = adrolloResponse.getString("img_url");
 					if(img_url == null || img_url.isEmpty()) {
 						img_url = "http://adrollo-images.s3.amazonaws.com/logo4.gif";
 					}
 
 
-					String redirect_url = (String)adrolloResponse.get("landing_url");
+					String redirect_url = adrolloResponse.getString("landing_url");
 					if(redirect_url == null || redirect_url.isEmpty()) {
 						redirect_url = "";
 					}
 
+					int ad_type = adrolloResponse.getInt("ad_type");
 
-					String ad_type = (String)adrolloResponse.get("ad_type");
-					if(ad_type == null || ad_type.isEmpty()) {
-						ad_type = "";
-					}
-
-
-					String ad_text = (String)adrolloResponse.get("ad_text");
+					String ad_text = adrolloResponse.getString("ad_text");
 					if(ad_text == null || ad_text.isEmpty()) {
 						ad_text = "";
 					}
@@ -163,8 +161,6 @@ public class AdrolloServlet extends HttpServlet {
 					.value(img_url)
 					.key("redirect_url")
 					.value(redirect_url)
-					.key("metrics_url")
-					.value("")
 					.key("ad_type")
 					.value(ad_type)
 					.key("ad_text")
@@ -181,8 +177,10 @@ public class AdrolloServlet extends HttpServlet {
 
 					String metricsRequest = "http://" + AdWhirlUtil.SERVER + "/exmet.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200";
 					new URL(metricsRequest).openStream().close();
+
+					log.debug("Success on <" + s_adrolloUrl + ">");
 				} catch (JSONException e) {
-					log.error("Unable to parse mdotm's JSON", e);
+					log.error("Unable to parse mdotm's JSON <" + s_adrolloUrl + ", " + mdotmJson + ">", e);
 				}
 			}			
 		}
