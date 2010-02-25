@@ -245,7 +245,12 @@ public class CustomsServlet extends HttpServlet
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		out.print(jsonCustom);
+		if(jsonCustom == null) {
+			out.print("[]");
+		}
+		else {
+			out.print(jsonCustom);
+		}
 		out.close();
 	}
 
