@@ -71,7 +71,7 @@ public class AdrolloServlet extends HttpServlet {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required.");
 			return;
 		}		
-		aid = aid.trim();
+		aid = aid.trim().replaceAll("%20", "");
 
 		String locale = httpServletRequest.getParameter("country_code");
 		if(locale == null || locale.isEmpty()) {	
