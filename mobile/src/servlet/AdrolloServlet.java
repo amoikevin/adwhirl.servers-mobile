@@ -85,12 +85,6 @@ public class AdrolloServlet extends HttpServlet {
 			return;
 		}		
 
-		String location = httpServletRequest.getParameter("location");
-		if(location == null || location.isEmpty()) {	
-			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <location> is required.");
-			return;
-		}		
-
 		String clientIP = httpServletRequest.getHeader("X-Forwarded-For");
 
 		String key = aid;
