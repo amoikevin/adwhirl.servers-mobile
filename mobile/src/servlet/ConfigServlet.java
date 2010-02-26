@@ -136,7 +136,7 @@ public class ConfigServlet extends HttpServlet {
 			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required.");
 			return;
 		}		
-		aid = aid.trim();
+		aid = aid.trim().replaceAll("%20", "");
 
 		String s_appver = httpServletRequest.getParameter("appver");
 		int appver;
