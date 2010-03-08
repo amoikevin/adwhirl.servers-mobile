@@ -99,7 +99,7 @@ public class CacheUtil {
 					    }
 					}
 					catch(NumberFormatException e) {
-					    log.info("Invalid data for aid <" + aid + ">: " + e.getMessage(), e);
+					    log.error("Invalid data for aid <" + aid + ">: " + e.getMessage(), e);
 					}
 				}
 
