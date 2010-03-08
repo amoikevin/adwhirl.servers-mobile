@@ -56,45 +56,50 @@ public class CacheUtil {
 						continue;						
 					}
 
-					String attributeName = attribute.getName();
-					if(attributeName.equals("adsOn")) {
+					try {
+					    String attributeName = attribute.getName();
+					    if(attributeName.equals("adsOn")) {
 						if(attribute.isSetValue()) {
-							int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-							extra.setAdsOn(adsOn);
+						    int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
+						    extra.setAdsOn(adsOn);
 						}
-					}
-					else if(attributeName.equals("locationOn")) {
+					    }
+					    else if(attributeName.equals("locationOn")) {
 						if(attribute.isSetValue()) {
-							locationOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-							extra.setLocationOn(locationOn);
+						    locationOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
+						    extra.setLocationOn(locationOn);
 						}
-					}
-					else if(attributeName.equals("fgColor")) {
+					    }
+					    else if(attributeName.equals("fgColor")) {
 						if(attribute.isSetValue()) {
-							fgColor = attribute.getValue();
-							extra.setFgColor(fgColor);
+						    fgColor = attribute.getValue();
+						    extra.setFgColor(fgColor);
 						}
-					}
-					else if(attributeName.equals("bgColor")) {
+					    }
+					    else if(attributeName.equals("bgColor")) {
 						if(attribute.isSetValue()) {
-							bgColor = attribute.getValue();
-							extra.setBgColor(bgColor);
+						    bgColor = attribute.getValue();
+						    extra.setBgColor(bgColor);
 						}
-					}
-					else if(attributeName.equals("cycleTime")) {
+					    }
+					    else if(attributeName.equals("cycleTime")) {
 						if(attribute.isSetValue()) {
-							cycleTime = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-							extra.setCycleTime(cycleTime);
+						    cycleTime = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
+						    extra.setCycleTime(cycleTime);
 						}
-					}
-					else if(attributeName.equals("transition")) {
+					    }
+					    else if(attributeName.equals("transition")) {
 						if(attribute.isSetValue()) {
-							transition = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-							extra.setTransition(transition);
+						    transition = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
+						    extra.setTransition(transition);
 						}
-					}
-					else {
+					    }
+					    else {
 						log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
+					    }
+					}
+					catch(NumberFormatException e) {
+					    log.info("Invalid data for aid <" + aid + ">: " + e.getMessage(), e);
 					}
 				}
 
@@ -168,9 +173,9 @@ public class CacheUtil {
 			} 
 		}
 		catch (AmazonSimpleDBException e) {
-			log.error("Error querying SimpleDB: " + e.getMessage());
-			return;
-		}	
+		    log.error("Error querying SimpleDB: " + e.getMessage());
+		    return;
+		}       
 	}
 
 
