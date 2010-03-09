@@ -19,8 +19,12 @@ import com.amazonaws.sdb.AmazonSimpleDBException;
 import com.amazonaws.sdb.model.CreateDomainRequest;
 
 import org.apache.log4j.Logger;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.NCSARequestLog;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
+import org.mortbay.jetty.handler.HandlerCollection;
+import org.mortbay.jetty.handler.RequestLogHandler;
 import org.mortbay.jetty.servlet.*;
 
 import servlet.ConfigServlet;
@@ -45,10 +49,21 @@ public class Invoker {
 
 		Server server = new Server(80);
 		try {
+			HandlerCollection handlers = new HandlerCollection();
 			ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
 	        Context servletContext = new Context(contextHandlerCollection, "/");
 	        servletContext.addServlet(new ServletHolder(new	ConfigServlet(servletContext)), "/getInfo.php");
-	        server.setHandler(contextHandlerCollection);
+	        RequestLogHandler requestLogHandler = new RequestLogHandler();
+
+	        NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
+	        requestLog.setRetainDays(3);
+	        requestLog.setAppend(true);
+	        requestLog.setExtended(false);
+	        requestLog.setLogTimeZone("GMT");
+	        requestLogHandler.setRequestLog(requestLog);
+	        
+	        handlers.setHandlers(new Handler[]{contextHandlerCollection ,requestLogHandler});
+	        server.setHandler(handlers);
 	        server.start();
 		} catch (Exception e) {
 			log.fatal("Unable to start server: " + e.getMessage());

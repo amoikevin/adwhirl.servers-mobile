@@ -81,8 +81,8 @@ public class CustomsServlet extends HttpServlet
 		
 		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
 
-		preloadAppCustoms();
-		preloadCustoms();
+		//		preloadAppCustoms();
+		//		preloadCustoms();
 		
 
 	    Thread customsInvalidater = new Thread(new InvalidateCustomsThread(customsCache, appCustomsCache));
