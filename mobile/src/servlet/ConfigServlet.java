@@ -76,7 +76,7 @@ public class ConfigServlet extends HttpServlet {
 
 		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
 
-		//		preloadConfigs();
+		preloadConfigs();
 
 		log.info("Config Servlet initialized completed, loading other servlets...");
 
