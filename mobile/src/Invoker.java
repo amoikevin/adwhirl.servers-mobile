@@ -55,7 +55,7 @@ public class Invoker {
 	        servletContext.addServlet(new ServletHolder(new	ConfigServlet(servletContext)), "/getInfo.php");
 	        RequestLogHandler requestLogHandler = new RequestLogHandler();
 
-	        NCSARequestLog requestLog = new NCSARequestLog("./logs/jetty-yyyy_mm_dd.request.log");
+	        NCSARequestLog requestLog = new NCSARequestLog("/mnt/adwhirl/jetty-yyyy_mm_dd.request.log");
 	        requestLog.setRetainDays(3);
 	        requestLog.setAppend(true);
 	        requestLog.setExtended(false);
