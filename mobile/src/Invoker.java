@@ -56,7 +56,7 @@ public class Invoker {
 	        RequestLogHandler requestLogHandler = new RequestLogHandler();
 
 	        NCSARequestLog requestLog = new NCSARequestLog("/mnt/adwhirl/jetty-yyyy_mm_dd.request.log");
-	        requestLog.setRetainDays(3);
+	        requestLog.setRetainDays(8);
 	        requestLog.setAppend(true);
 	        requestLog.setExtended(false);
 	        requestLog.setLogTimeZone("GMT");
