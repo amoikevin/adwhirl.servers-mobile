@@ -85,6 +85,7 @@ public class AdrolloServlet extends HttpServlet {
 			return;
 		}		
 
+		//		String clientIP = httpServletRequest.getRemoteAddr();
 		String clientIP = httpServletRequest.getHeader("X-Forwarded-For");
 
 		String key = aid;
