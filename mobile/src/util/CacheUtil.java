@@ -123,41 +123,46 @@ public class CacheUtil {
 								continue;						
 							}
 
-							String networkAttributeName = networkAttribute.getName();
-							if(networkAttributeName.equals("adsOn")) {
+							try {
+							    String networkAttributeName = networkAttribute.getName();
+							    if(networkAttributeName.equals("adsOn")) {
 								if(networkAttribute.isSetValue()) {
-									int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue());
-									if(adsOn == 0) {
-										//We don't care about reporting back a network that isn't active
-										continue networks_loop;
-									}
+								    int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue());
+								    if(adsOn == 0) {
+									//We don't care about reporting back a network that isn't active
+									continue networks_loop;
+								    }
 								}
-							}
-							else if(networkAttributeName.equals("type")) {
+							    }
+							    else if(networkAttributeName.equals("type")) {
 								if(networkAttribute.isSetValue()) {
-									ration.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
+								    ration.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
 								}
-							}
-							else if(networkAttributeName.equals("weight")) {
+							    }
+							    else if(networkAttributeName.equals("weight")) {
 								if(networkAttribute.isSetValue()) {
-									ration.setWeight(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
+								    ration.setWeight(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
 								}
-							}								
-							else if(networkAttributeName.equals("priority")) {
+							    }								
+							    else if(networkAttributeName.equals("priority")) {
 								if(networkAttribute.isSetValue()) {
-									ration.setPriority(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
+								    ration.setPriority(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
 								}
-							}								
-							else if(networkAttributeName.equals("key")) {
+							    }								
+							    else if(networkAttributeName.equals("key")) {
 								if(networkAttribute.isSetValue()) {
-									ration.setNetworkKey(networkAttribute.getValue());
+								    ration.setNetworkKey(networkAttribute.getValue());
 								}
-							}
-							else if(networkAttributeName.equals("aid")) {
+							    }
+							    else if(networkAttributeName.equals("aid")) {
 								// We already know the aid.
-							}
-							else {
+							    }
+							    else {
 								log.info("SELECT request pulled an unknown attribute: " + networkAttributeName + "|" + networkAttribute.getValue());
+							    }
+							}
+							catch(NumberFormatException e) {
+							    log.error("Invalid data for aid <" + aid + ">: " + e.getMessage(), e);
 							}
 						}
 
