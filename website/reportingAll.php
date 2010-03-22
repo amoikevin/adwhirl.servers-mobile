@@ -146,7 +146,7 @@ View:
 												   <h2>
 												   <?php 
 												   if ($chartType != REPORT_ALL)
-												     echo 'CTR = '.number_format($ctr, 2, '.', '').'%';
+												     echo 'CTR = '.number_format($ctr, 3, '.', '').'%';
 ?>
   </h2>
   </ul>
@@ -169,23 +169,18 @@ function getCTR($appId, $startDate, $endDate, $chartType, $customNids) {
   $clicks = 0;
 
   if ($chartType == REPORT_ALL || $chartType == REPORT_CUSTOM_ALL) {
-    $customNidsArray = array();
-    foreach ($customNids as $oneCustom) {
-      $customNidsArray[] = "itemName ='".$oneCustom['NID']."'";
-    }
-
-    $nidsString = implode(' or ', $customNidsArray);
+    $nidsString = "`type` = '9'";
   } else {
-    $nidsString = "'".$chartType."'";
+    $nidsString = "`nid` = '".$chartType."'";
   }
 
   if(empty($nidsString)) {
     return 0;
   }
   $aaa = array('clicks', 'impressions');
-  $sdb->select(DOMAIN_STATS, $aaa, "where `dateTime` > '$startDate' and `dateTime` < '$endDate' and $nidsString");
+  $sdb->select(DOMAIN_STATS, $aaa, "where `dateTime` >= '$startDate' and `dateTime` <= '$endDate' and $nidsString");
 
-  foreach($aaa as $as) {
+  foreach($aaa as $aa) {
     $clicks += $aa['clicks'];
     $impressions += $aa['impressions'];
   }

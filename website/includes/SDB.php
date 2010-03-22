@@ -48,6 +48,8 @@ class SDB {
 	  else {
 		  $select = "select $aaa from `$domain` $where";
 	  }
+
+	  //  print "Select: $select<br />\n";
 	  
     $aaa = array();
         
