@@ -671,57 +671,61 @@ public class CacheUtil {
 						continue;						
 					}
 
-					String attributeName = attribute.getName();		
-					if(attributeName.equals("type")) {
+					try {
+					    String attributeName = attribute.getName();		
+					    if(attributeName.equals("type")) {
 						if(attribute.isSetValue()) {
-							customAd.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue()));
+						    customAd.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue()));
 						}
-					}
-					else if(attributeName.equals("aid")) {
+					    }
+					    else if(attributeName.equals("aid")) {
 						if(attribute.isSetValue()) {
-							customAd.setAid(attribute.getValue());
+						    customAd.setAid(attribute.getValue());
 						}
-					}
-					else if(attributeName.equals("imageLink")) {
+					    }
+					    else if(attributeName.equals("imageLink")) {
 						if(attribute.isSetValue()) {
-							customAd.setImageLink(attribute.getValue());
+						    customAd.setImageLink(attribute.getValue());
 						}
-					}					
-					else if(attributeName.equals("link")) {
+					    }					
+					    else if(attributeName.equals("link")) {
 						if(attribute.isSetValue()) {
-							customAd.setLink(attribute.getValue());
+						    customAd.setLink(attribute.getValue());
 						}
-					}				
-					else if(attributeName.equals("description")) {
+					    }				
+					    else if(attributeName.equals("description")) {
 						if(attribute.isSetValue()) {
-							customAd.setDescription(attribute.getValue());
+						    customAd.setDescription(attribute.getValue());
 						}
-					}					
-					else if(attributeName.equals("name")) {
+					    }					
+					    else if(attributeName.equals("name")) {
 						if(attribute.isSetValue()) {
-							customAd.setName(attribute.getValue());
+						    customAd.setName(attribute.getValue());
 						}
-					}
-					else if(attributeName.equals("linkType")) {
+					    }
+					    else if(attributeName.equals("linkType")) {
 						if(attribute.isSetValue()) {
-							customAd.setLinkType(attribute.getValue());
+						    customAd.setLinkType(attribute.getValue());
 						}
-					}
-					else if(attributeName.equals("launchType")) {
+					    }
+					    else if(attributeName.equals("launchType")) {
 						if(attribute.isSetValue()) {
-							customAd.setLaunchType(attribute.getValue());
+						    customAd.setLaunchType(attribute.getValue());
 						}
-					}
-					else {
+					    }
+					    else {
 						log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
+					    }
+					}
+					catch(NumberFormatException e) {
+					    log.error("Invalid data for custom <" + nid + ">: " + e.getMessage(), e);
 					}
 				}
-
 				try {
-					genJsonCustoms(cache, nid, customAd);
+				    genJsonCustoms(cache, nid, customAd);
 				} catch (JSONException e) {
-					log.error("Error creating jsonConfig: " + e.getMessage());
-					return;
+				    log.error("Error creating jsonConfig: " + e.getMessage());
+				    return;
 				}
 			}	
 		}
@@ -810,15 +814,20 @@ public class CacheUtil {
 						continue;						
 					}
 
-					String attributeName = attribute.getName();		
-					if(attributeName.equals("weight")) {
+					try {
+					    String attributeName = attribute.getName();		
+					    if(attributeName.equals("weight")) {
 						if(attribute.isSetValue()) {
-							int weight = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-							ration.setWeight(weight);
+						    int weight = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
+						    ration.setWeight(weight);
 						}
-					}
-					else {
+					    }
+					    else {
 						log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
+					    }
+					}
+					catch(NumberFormatException e) {
+					    log.error("Invalid data for app custom <" + aid + ">: " + e.getMessage(), e);
 					}
 				}
 
