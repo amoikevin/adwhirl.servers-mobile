@@ -214,7 +214,8 @@ public class CustomsServlet extends HttpServlet
 			return;
 		}
 		
-		String metricsRequest = "http://" + AdWhirlUtil.SERVER + "/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
+		//String metricsRequest = "http://" + AdWhirlUtil.SERVER + "/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
+		String metricsRequest = "http://localhost/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
 		//This should make the connection...
 		new URL(metricsRequest).openStream().close();
 
