@@ -168,6 +168,8 @@ public class ConfigServlet extends HttpServlet {
 		}
 		else {
 			log.debug("Cache miss on \"" + key + "\"");
+		    /*
+			log.debug("Cache miss on \"" + key + "\"");
 			loadApp(aid);
 			
 			Element loadedConfig = cache.get(key);
@@ -177,6 +179,8 @@ public class ConfigServlet extends HttpServlet {
 			else {
 				jsonConfig = (String)loadedConfig.getObjectValue();
 			}
+		    */
+		    jsonConfig = "[]";
 		}
 
 		httpServletResponse.setCharacterEncoding("UTF-8");
