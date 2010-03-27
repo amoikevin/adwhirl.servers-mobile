@@ -231,6 +231,7 @@ public class CustomsServlet extends HttpServlet
 			jsonCustom = (String)cachedCustom.getObjectValue();
 		}
 		else {
+		    /*
 			log.debug("Cache miss on \"" + key + "\"");
 			loadCustom(nid);
 			
@@ -241,6 +242,8 @@ public class CustomsServlet extends HttpServlet
 			else {
 				jsonCustom = (String)loadedConfig.getObjectValue();
 			}
+		    */
+		    jsonCustom = "[]";
 		}
 		
 		response.setCharacterEncoding("UTF-8");
@@ -267,6 +270,7 @@ public class CustomsServlet extends HttpServlet
 			rations = (List<Ration>)cachedAppCustoms.getObjectValue();
 		}
 		else {
+		    /*
 			log.debug("Cache miss on \"" + key + "\"");
 			loadAppCustom(aid);
 			
@@ -277,6 +281,8 @@ public class CustomsServlet extends HttpServlet
 			else {
 				rations = (List<Ration>)loadedAppCustoms.getObjectValue();
 			}
+		    */
+		    return null;
 		}
 
 		if(rations == null || rations.isEmpty()) {

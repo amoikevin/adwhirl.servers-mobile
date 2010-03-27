@@ -98,6 +98,7 @@ public class AdrolloServlet extends HttpServlet {
 			adrolloRation = (Ration)cachedRation.getObjectValue();
 		}
 		else {
+		    /*
 			log.debug("Cache miss on \"" + key + "\"");
 			loadAdrollo(aid);
 
@@ -108,6 +109,8 @@ public class AdrolloServlet extends HttpServlet {
 			else {
 				adrolloRation = (Ration)loadedRation.getObjectValue();
 			}
+		    */
+		    adrolloRation = null;
 		}
 
 		if(adrolloRation != null) {
