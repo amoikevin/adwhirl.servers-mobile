@@ -33,7 +33,7 @@ public class CacheUtil {
 	}
 
 	public void loadApp(Cache cache, String aid) {
-		log.info("Loading app <" + aid + "> into the cache");
+		log.debug("Loading app <" + aid + "> into the cache");
 		Extra extra = new Extra();
 
 		//First we pull the general configuration information
@@ -653,7 +653,7 @@ public class CacheUtil {
 	}
 
 	public void loadCustom(Cache cache, String nid) {
-		log.info("Loading custom <" + nid + "> into the cache");
+		log.debug("Loading custom <" + nid + "> into the cache");
 
 		//Custom (house) ad select query
 		SelectRequest customRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "` where itemName() = '" + nid + "' limit 1", null);
@@ -792,7 +792,7 @@ public class CacheUtil {
 	
 
 	public void loadAppCustom(Cache cache, String aid) {
-	    log.info("Loading app custom <" + aid + "> into the cache");
+	    log.debug("Loading app custom <" + aid + "> into the cache");
 
 		List<Ration> rations = new ArrayList<Ration>();
 		
@@ -843,7 +843,7 @@ public class CacheUtil {
 	}
 
 	public void loadAdrollo(Cache cache, String aid) {
-	    log.info("Loading adrollo for <" + aid + "> into the cache");
+	    log.debug("Loading adrollo for <" + aid + "> into the cache");
 
 		//Get weights for custom networks of aid
 		String select = "select `key` from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + AdWhirlUtil.NETWORKS.MDOTM.ordinal() + "'";

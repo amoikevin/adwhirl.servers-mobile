@@ -41,7 +41,7 @@ public class CacheCustomsLoaderThread implements Runnable {
 	}
 	
 	public void run() {
-		log.info("CacheCustomsLoaderThread<"+ threadId + "> started");
+		log.debug("CacheCustomsLoaderThread<"+ threadId + "> started");
 			
 		CacheUtil cacheUtil = new CacheUtil();
 		

@@ -41,7 +41,7 @@ public class CacheConfigLoaderThread implements Runnable {
 	}
 	
 	public void run() {
-		log.info("PreloadThread<"+ threadId + "> started");
+	    log.debug("PreloadThread<"+ threadId + "> started");
 			
 		CacheUtil cacheUtil = new CacheUtil();
 		

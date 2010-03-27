@@ -167,7 +167,7 @@ public class ConfigServlet extends HttpServlet {
 			jsonConfig = (String)cachedConfig.getObjectValue();
 		}
 		else {
-			log.debug("Cache miss on \"" + key + "\"");
+			log.info("Cache <config> miss on \"" + key + "\"");
 		    /*
 			log.debug("Cache miss on \"" + key + "\"");
 			loadApp(aid);

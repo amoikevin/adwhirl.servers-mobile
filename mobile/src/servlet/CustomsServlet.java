@@ -231,8 +231,8 @@ public class CustomsServlet extends HttpServlet
 			jsonCustom = (String)cachedCustom.getObjectValue();
 		}
 		else {
+			log.info("Cache <customs> miss on \"" + key + "\"");
 		    /*
-			log.debug("Cache miss on \"" + key + "\"");
 			loadCustom(nid);
 			
 			Element loadedConfig = customsCache.get(key);
@@ -270,8 +270,8 @@ public class CustomsServlet extends HttpServlet
 			rations = (List<Ration>)cachedAppCustoms.getObjectValue();
 		}
 		else {
+			log.info("Cache <appCustoms> miss on \"" + key + "\"");
 		    /*
-			log.debug("Cache miss on \"" + key + "\"");
 			loadAppCustom(aid);
 			
 			Element loadedAppCustoms = appCustomsCache.get(key);
