@@ -227,7 +227,7 @@ public class CustomsServlet extends HttpServlet
 			jsonCustom = (String)cachedCustom.getObjectValue();
 		}
 		else {
-			log.info("Cache <customs> miss on \"" + key + "\"");
+			log.warn("Cache <customs> miss on \"" + key + "\"");
 		    jsonCustom = "[]";
 		}
 		
@@ -255,7 +255,7 @@ public class CustomsServlet extends HttpServlet
 			rations = (List<Ration>)cachedAppCustoms.getObjectValue();
 		}
 		else {
-			log.info("Cache <appCustoms> miss on \"" + key + "\"");
+			log.warn("Cache <appCustoms> miss on \"" + key + "\"");
 		    return null;
 		}
 

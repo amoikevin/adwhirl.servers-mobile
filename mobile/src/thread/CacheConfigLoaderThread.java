@@ -30,12 +30,14 @@ public class CacheConfigLoaderThread implements Runnable {
 	static Logger log = Logger.getLogger("PreloadThread");
 
 	private Cache cache;
+    private Cache adrolloCache;
 	
 	private List<Item> appsList;
 	private int threadId;
 	
-	public CacheConfigLoaderThread(Cache cache, List<Item> appsList, int threadId) {
+    public CacheConfigLoaderThread(Cache cache, Cache adrolloCache, List<Item> appsList, int threadId) {
 		this.cache = cache;
+		this.adrolloCache = adrolloCache;
 	    this.appsList = appsList;
 	    this.threadId = threadId;
 	}
@@ -48,7 +50,7 @@ public class CacheConfigLoaderThread implements Runnable {
 		for(Item item : appsList) {
 			String aid = item.getName();
 			cacheUtil.loadApp(cache, aid);
-			cacheUtil.loadAdrollo(cache, aid);
+			cacheUtil.loadAdrollo(adrolloCache, aid);
 		}
 	}
 }

@@ -37,11 +37,13 @@ public class InvalidateConfigsThread implements Runnable {
 	static Logger log = Logger.getLogger("InvalidateConfigsThread");
 	
 	private Cache cache;
+    private Cache adrolloCache;
 	private CacheUtil cacheUtil;
 	private static AmazonSimpleDB sdb;
 	
-	public InvalidateConfigsThread(Cache cache) {
+    public InvalidateConfigsThread(Cache cache, Cache adrolloCache) {
 		this.cache = cache;
+		this.adrolloCache = adrolloCache;
 		this.cacheUtil = new CacheUtil();
 	}
 	
@@ -77,7 +79,7 @@ public class InvalidateConfigsThread implements Runnable {
 					String aid = item.getName();
 					log.info("Cached response for app <" + aid + "> may be invalid");
 					cacheUtil.loadApp(cache, aid);
-					cacheUtil.loadAdrollo(cache, aid);
+					cacheUtil.loadAdrollo(adrolloCache, aid);
 				}
 			}
 			catch(AmazonSimpleDBException e) {

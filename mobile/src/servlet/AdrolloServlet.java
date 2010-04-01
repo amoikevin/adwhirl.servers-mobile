@@ -100,17 +100,8 @@ public class AdrolloServlet extends HttpServlet {
 	    adrolloRation = (Ration)cachedRation.getObjectValue();
 	}
 	else {
-	    log.info("Cache miss on \"" + key + "\"");
-
-	    loadAdrollo(aid);
-	    
-	    Element loadedRation = cache.get(key);
-	    if(loadedRation == null) {
-		log.warn("Unable to load adrollo: " + aid);
-	    }
-	    else {
-		adrolloRation = (Ration)loadedRation.getObjectValue();
-	    }
+	    log.warn("Cache miss on \"" + key + "\"");
+	    adrolloRation = null;
 	}
 
 	if(adrolloRation != null) {
@@ -211,10 +202,5 @@ public class AdrolloServlet extends HttpServlet {
 	    out.print(jsonAdrollo);
 	}
 	out.close();	
-    }
-
-    private void loadAdrollo(String aid) {
-	CacheUtil cacheUtil = new CacheUtil();
-	cacheUtil.loadAdrollo(cache, aid);
     }
 }

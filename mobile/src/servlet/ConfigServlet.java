@@ -87,12 +87,18 @@ public class ConfigServlet extends HttpServlet {
 
 		servletContext.addServlet(new ServletHolder(new	HealthCheckServlet()), "/ping");
 		
-	    Thread invalidater = new Thread(new InvalidateConfigsThread(cache));
+		String adrolloCacheName = "adrolloRations";
+		Cache adrolloCache = CacheManager.getInstance().getCache(adrolloCacheName);
+
+		Thread invalidater = new Thread(new InvalidateConfigsThread(cache, adrolloCache));
 	    invalidater.start();
 	}
 
 	private void preloadConfigs() {
 		List<Thread> threads = new ArrayList<Thread>();
+
+		String adrolloCacheName = "adrolloRations";
+		Cache adrolloCache = CacheManager.getInstance().getCache(adrolloCacheName);
 		
 		int threadId = 1;
 		String appsNextToken = null;
@@ -104,7 +110,7 @@ public class ConfigServlet extends HttpServlet {
 			    appsNextToken = appsResult.getNextToken();
 			    List<Item> appsList = appsResult.getItem();
 				    
-			    Thread thread = new Thread(new CacheConfigLoaderThread(cache, appsList, threadId++));
+			    Thread thread = new Thread(new CacheConfigLoaderThread(cache, adrolloCache, appsList, threadId++));
 			    threads.add(thread);
 			    thread.start();
 			}
@@ -160,7 +166,7 @@ public class ConfigServlet extends HttpServlet {
 			jsonConfig = (String)cachedConfig.getObjectValue();
 		}
 		else {
-			log.info("Cache <config> miss on \"" + key + "\"");
+			log.warn("Cache <config> miss on \"" + key + "\"");
 		    jsonConfig = "[]";
 		}
 
