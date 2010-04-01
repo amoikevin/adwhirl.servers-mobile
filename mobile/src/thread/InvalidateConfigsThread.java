@@ -80,7 +80,7 @@ public class InvalidateConfigsThread implements Runnable {
 				}
 			}
 			catch(AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
+				log.warn("Error querying SimpleDB: " + e.getMessage());
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;

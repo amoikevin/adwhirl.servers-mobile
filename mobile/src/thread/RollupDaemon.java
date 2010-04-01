@@ -71,7 +71,7 @@ public class RollupDaemon implements Runnable {
 		    helper.start();
 		}
 		catch(AmazonSimpleDBException e) {
-		    log.error("Error querying SimpleDB: " + e.getMessage());
+		    log.warn("Error querying SimpleDB: " + e.getMessage());
 
 		    // Eventually we'll get a 'stale request' error and need to start over.
 		    invalidsNextToken = null;
@@ -79,7 +79,6 @@ public class RollupDaemon implements Runnable {
 	    }
 	    while(invalidsNextToken != null);
 
-	    //TODO: Might need to tweak this.
 	    try {
 	    Thread.sleep(2 * 60000);
 	    } catch (InterruptedException e) {
@@ -126,7 +125,7 @@ public class RollupDaemon implements Runnable {
 
 	private void rollupNetworkStats(String nid, String aid) {
 	    if(nid == null || aid == null) {
-		log.error("Null parameter passed, nid=\"" + nid + "\" and aid=\"" + aid + "\"");
+		log.warn("Null parameter passed, nid=\"" + nid + "\" and aid=\"" + aid + "\"");
 		return;
 	    }
 		
@@ -177,7 +176,7 @@ public class RollupDaemon implements Runnable {
 		    }
 		}
 		catch(AmazonSimpleDBException e) {
-		    log.error("Error querying SimpleDB: " + e.getMessage());
+		    log.warn("Error querying SimpleDB: " + e.getMessage());
 		    return;
 		}
 	    }
@@ -242,7 +241,7 @@ public class RollupDaemon implements Runnable {
 		putItem(AdWhirlUtil.DOMAIN_STATS, itemName, list);
 	    }
 	    catch(AmazonSimpleDBException e) {
-		log.error("Error querying SimpleDB: " + e.getMessage());
+		log.warn("Error querying SimpleDB: " + e.getMessage());
 		return false;
 	    }
 		
@@ -267,7 +266,7 @@ public class RollupDaemon implements Runnable {
 		try {
 		    sdb.deleteAttributes(deleteRequest);
 		} catch (AmazonSimpleDBException e) {
-		    log.error("Error querying SimpleDB: " + e.getMessage());
+		    log.warn("Error querying SimpleDB: " + e.getMessage());
 		    return;
 		}
 	    }
@@ -277,7 +276,7 @@ public class RollupDaemon implements Runnable {
 	    try {
 		sdb.deleteAttributes(deleteRequest);
 	    } catch (AmazonSimpleDBException e) {
-		log.error("Error querying SimpleDB: " + e.getMessage());
+		log.warn("Error querying SimpleDB: " + e.getMessage());
 		return;
 	    }
 	}
@@ -289,7 +288,7 @@ public class RollupDaemon implements Runnable {
 	    try {
 		sdb.putAttributes(request);
 	    } catch (AmazonSimpleDBException e) {
-		log.error("Error querying SimpleDB: " + e.getMessage());
+		log.warn("Error querying SimpleDB: " + e.getMessage());
 		return;
 	    }
 	}

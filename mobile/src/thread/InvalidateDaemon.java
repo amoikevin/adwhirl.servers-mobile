@@ -63,7 +63,6 @@ public class InvalidateDaemon implements Runnable {
 		    invalidateApps(dateTime);
 		    invalidateCustoms(dateTime);
 
-			//TODO: Might need to tweak this.
 			try {
 				Thread.sleep(30000);
 			} catch (InterruptedException e) {
@@ -88,7 +87,7 @@ public class InvalidateDaemon implements Runnable {
 				}
 			}
 			catch(AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
+				log.warn("Error querying SimpleDB: " + e.getMessage());
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;
@@ -113,7 +112,7 @@ public class InvalidateDaemon implements Runnable {
 				}
 			}
 			catch(AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
+				log.warn("Error querying SimpleDB: " + e.getMessage());
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;
@@ -128,7 +127,7 @@ public class InvalidateDaemon implements Runnable {
 			try {
 				sdb.deleteAttributes(deleteRequest);
 			} catch (AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
+				log.warn("Error querying SimpleDB: " + e.getMessage());
 				return;
 			}
 		}

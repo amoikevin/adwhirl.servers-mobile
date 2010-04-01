@@ -109,7 +109,7 @@ public class ConfigServlet extends HttpServlet {
 			    thread.start();
 			}
 			catch(AmazonSimpleDBException e) {
-			    log.error("Error querying SimpleDB: " + e.getMessage());
+			    log.warn("Error querying SimpleDB: " + e.getMessage());
 		    }
 	    }
 	    while(appsNextToken != null);

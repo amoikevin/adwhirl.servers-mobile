@@ -107,7 +107,7 @@ public class MetricsServlet extends HttpServlet
 	    i_hitType = AdWhirlUtil.HITTYPE.IMPRESSION.ordinal();
 	}
 	else {
-	    log.error("Unable to determine hitType from request: " + requestURI);
+	    log.warn("Unable to determine hitType from request: " + requestURI);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown request URI");
 	    return;
 	}
@@ -165,7 +165,7 @@ public class MetricsServlet extends HttpServlet
 	element = cache.get(key);
 			
 	if(element == null) {
-	    //TODO: Depending on traffic, this may need a semaphore
+	    //TODO: Depending on traffic, this may need a semaphore or be generated beforehand
 	    ho = new HitObject(aid, type);
 	    element = new Element(key, ho);
 	    cache.put(element);

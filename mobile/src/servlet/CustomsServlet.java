@@ -107,7 +107,7 @@ public class CustomsServlet extends HttpServlet
 			    thread.start();
 			}
 			catch(AmazonSimpleDBException e) {
-			    log.error("Error querying SimpleDB: " + e.getMessage());
+			    log.warn("Error querying SimpleDB: " + e.getMessage());
 		    }
 	    }
 	    while(customsNextToken != null);
@@ -139,7 +139,7 @@ public class CustomsServlet extends HttpServlet
 			    thread.start();
 			}
 			catch(AmazonSimpleDBException e) {
-			    log.error("Error querying SimpleDB: " + e.getMessage());
+			    log.warn("Error querying SimpleDB: " + e.getMessage());
 		    }
 	    }
 	    while(appsNextToken != null);
@@ -213,7 +213,6 @@ public class CustomsServlet extends HttpServlet
 		}
 		
 		String metricsRequest = "http://localhost/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
-		//This should make the connection...
 		new URL(metricsRequest).openStream().close();
 
 		appver = cacheVersionCustom(appver);
@@ -229,17 +228,6 @@ public class CustomsServlet extends HttpServlet
 		}
 		else {
 			log.info("Cache <customs> miss on \"" + key + "\"");
-		    /*
-			loadCustom(nid);
-			
-			Element loadedConfig = customsCache.get(key);
-			if(loadedConfig == null) {
-				log.error("Unable to load custom: " + nid);
-			}
-			else {
-				jsonCustom = (String)loadedConfig.getObjectValue();
-			}
-		    */
 		    jsonCustom = "[]";
 		}
 		
