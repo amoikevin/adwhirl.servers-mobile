@@ -77,6 +77,7 @@ public class InvalidateConfigsThread implements Runnable {
 					String aid = item.getName();
 					log.info("Cached response for app <" + aid + "> may be invalid");
 					cacheUtil.loadApp(cache, aid);
+					cacheUtil.loadAdrollo(cache, aid);
 				}
 			}
 			catch(AmazonSimpleDBException e) {

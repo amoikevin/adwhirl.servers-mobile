@@ -881,42 +881,49 @@ public class CacheUtil {
 	public void loadAdrollo(Cache cache, String aid) {
 		log.debug("Loading adrollo for <" + aid + "> into the cache");
 
-		//Get weights for custom networks of aid
-		String select = "select `key` from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + AdWhirlUtil.NETWORKS.MDOTM.ordinal() + "'";
-
-		SelectRequest request = new SelectRequest(select, null);
-		try {
-			SelectResponse response = sdb.select(request);
-			SelectResult result = response.getSelectResult();
-			List<Item> list = result.getItem();
-
-			for(Item item : list) {	
-				Ration ration = new Ration(item.getName());
-
-				List<Attribute> attributeList = item.getAttribute();
-				for(Attribute attribute : attributeList) {
-					if(!attribute.isSetName()) {
-						continue;						
-					}
-
-					String attributeName = attribute.getName();		
-					if(attributeName.equals("key")) {
-						if(attribute.isSetValue()) {
-							ration.setNetworkKey(attribute.getValue());
+		Ration ration = null;
+		
+		boolean loaded = false;
+		while(!loaded) {
+			//Get weights for custom networks of aid
+			String select = "select `key` from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + AdWhirlUtil.NETWORKS.MDOTM.ordinal() + "' limit 1";
+	
+			SelectRequest request = new SelectRequest(select, null);
+			try {
+				SelectResponse response = sdb.select(request);
+				SelectResult result = response.getSelectResult();
+				List<Item> list = result.getItem();
+	
+				for(Item item : list) {	
+					ration = new Ration(item.getName());
+	
+					List<Attribute> attributeList = item.getAttribute();
+					for(Attribute attribute : attributeList) {
+						if(!attribute.isSetName()) {
+							continue;						
+						}
+	
+						String attributeName = attribute.getName();		
+						if(attributeName.equals("key")) {
+							if(attribute.isSetValue()) {
+								ration.setNetworkKey(attribute.getValue());
+								break;
+							}
+						}
+						else {
+							log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
 						}
 					}
-					else {
-						log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
-					}
 				}
-
-				cache.put(new Element(aid, ration));	
-				break;
-			}		
+				
+				loaded = true;
+			}
+			catch (AmazonSimpleDBException e) {
+				log.error("Error querying SimpleDB: " + e.getMessage());
+				return;
+			}	
 		}
-		catch (AmazonSimpleDBException e) {
-			log.error("Error querying SimpleDB: " + e.getMessage());
-			return;
-		}	
+		
+		cache.put(new Element(aid, ration));
 	}
 }
