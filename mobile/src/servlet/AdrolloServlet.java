@@ -100,13 +100,13 @@ public class AdrolloServlet extends HttpServlet {
 	    adrolloRation = (Ration)cachedRation.getObjectValue();
 	}
 	else {
-	    log.info("Cache <adrollo> miss on \"" + key + "\"");
+	    log.info("Cache miss on \"" + key + "\"");
 
 	    loadAdrollo(aid);
 	    
 	    Element loadedRation = cache.get(key);
 	    if(loadedRation == null) {
-		log.error("Unable to load adrollo: " + aid);
+		log.warn("Unable to load adrollo: " + aid);
 	    }
 	    else {
 		adrolloRation = (Ration)loadedRation.getObjectValue();
@@ -134,7 +134,7 @@ public class AdrolloServlet extends HttpServlet {
 		in.close();
 	    }
 	    catch(SocketTimeoutException e) {
-		log.error("Adrollo connect timed out.");
+		log.info("Adrollo connect timed out.");
 	    }
 
 	    long adrolloEnd = System.currentTimeMillis();
@@ -189,7 +189,7 @@ public class AdrolloServlet extends HttpServlet {
 			.value(1)
 			.endObject().toString();
 
-		    String metricsRequest = "http://" + AdWhirlUtil.SERVER + "/exmet.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200";
+		    String metricsRequest = "http://localhost/exmet.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200";
 		    new URL(metricsRequest).openStream().close();
 
 		    log.debug("Success on <" + s_adrolloUrl + ">");
