@@ -1,5 +1,5 @@
 /*
-Copyright 2009 AdMob, Inc.
+Copyright 2009-2010 AdMob, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ import thread.CacheAppCustomsLoaderThread;
 import thread.CacheCustomsLoaderThread;
 import thread.InvalidateCustomsThread;
 import util.AdWhirlUtil;
-import util.CacheUtil;
 
 public class CustomsServlet extends HttpServlet 
 {	
@@ -64,7 +63,6 @@ public class CustomsServlet extends HttpServlet
 	public void init(ServletConfig servletConfig) throws ServletException {
 		CacheManager.create();
 
-		//TODO: Change cache settings according to your needs
 		String customsCacheName = "json_customs";
 		customsCache = CacheManager.getInstance().getCache(customsCacheName);
 		if(customsCache == null) {
@@ -214,7 +212,6 @@ public class CustomsServlet extends HttpServlet
 			return;
 		}
 		
-		//String metricsRequest = "http://" + AdWhirlUtil.SERVER + "/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
 		String metricsRequest = "http://localhost/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
 		//This should make the connection...
 		new URL(metricsRequest).openStream().close();
@@ -271,17 +268,6 @@ public class CustomsServlet extends HttpServlet
 		}
 		else {
 			log.info("Cache <appCustoms> miss on \"" + key + "\"");
-		    /*
-			loadAppCustom(aid);
-			
-			Element loadedAppCustoms = appCustomsCache.get(key);
-			if(loadedAppCustoms == null) {
-				log.error("Unable to load app customs: " + aid);
-			}
-			else {
-				rations = (List<Ration>)loadedAppCustoms.getObjectValue();
-			}
-		    */
 		    return null;
 		}
 
@@ -317,15 +303,5 @@ public class CustomsServlet extends HttpServlet
 	private int cacheVersionCustom(int appver) {
 		// There's only one version of customs JSON right now.
 		return 127;
-	}
-	
-	private void loadCustom(String nid) {
-		CacheUtil cacheUtil = new CacheUtil();
-		cacheUtil.loadApp(customsCache, nid);
-	}
-
-	private void loadAppCustom(String aid) {
-		CacheUtil cacheUtil = new CacheUtil();
-		cacheUtil.loadAppCustom(customsCache, aid);
 	}
 }

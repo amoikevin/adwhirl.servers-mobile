@@ -1,5 +1,5 @@
 /*
-Copyright 2009 AdMob, Inc.
+Copyright 2009-2010 AdMob, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ public class Daemon {
 	
 	public static void main(String[] args) {
 		Thread rollupDaemon = new Thread(new RollupDaemon());
-		rollupDaemon.start();	
+		rollupDaemon.start();
 		
 		Thread invalidateDaemon = new Thread(new InvalidateDaemon());
 		invalidateDaemon.start();	

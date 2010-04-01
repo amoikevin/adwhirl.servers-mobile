@@ -1,5 +1,5 @@
 /*
-Copyright 2009 AdMob, Inc.
+Copyright 2009-2010 AdMob, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ import org.mortbay.jetty.servlet.*;
 import thread.CacheConfigLoaderThread;
 import thread.InvalidateConfigsThread;
 import util.AdWhirlUtil;
-import util.CacheUtil;
 
 public class ConfigServlet extends HttpServlet {
     private static final long serialVersionUID = 7298139537865054861L;
@@ -66,7 +65,6 @@ public class ConfigServlet extends HttpServlet {
 	public void init(ServletConfig servletConfig) throws ServletException {
 		CacheManager.create();
 
-		//TODO: Change cache settings according to your needs
 		String cacheName = "json_configs";
 		cache = CacheManager.getInstance().getCache(cacheName);
 		if(cache == null) {
@@ -125,11 +123,6 @@ public class ConfigServlet extends HttpServlet {
 	    }
 	}
 
-	private void loadApp(String aid) {
-		CacheUtil cacheUtil = new CacheUtil();
-		cacheUtil.loadApp(cache, aid);
-	}
-
 	protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
 		String aid = httpServletRequest.getParameter("appid");
 		if(aid == null || aid.isEmpty()) {	
@@ -168,18 +161,6 @@ public class ConfigServlet extends HttpServlet {
 		}
 		else {
 			log.info("Cache <config> miss on \"" + key + "\"");
-		    /*
-			log.debug("Cache miss on \"" + key + "\"");
-			loadApp(aid);
-			
-			Element loadedConfig = cache.get(key);
-			if(loadedConfig == null) {
-				log.error("Unable to load application: " + aid);
-			}
-			else {
-				jsonConfig = (String)loadedConfig.getObjectValue();
-			}
-		    */
 		    jsonConfig = "[]";
 		}
 
