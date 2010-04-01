@@ -20,7 +20,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -113,17 +116,33 @@ public class AdrolloServlet extends HttpServlet {
 
 	if(adrolloRation != null) {
 	    String s_adrolloUrl = String.format("http://ads.mdotm.com/ads/feed.php?key=%s&deviceid=%s&width=320&height=50&platform=iphone&fmt=json&appkey=%s&clientip=%s", adrolloRation.getNetworkKey(), uuid, aid, clientIP);
-	    s_adrolloUrl = s_adrolloUrl.replaceAll("%", "|");			
-	    log.debug("Adrollo request to: " + s_adrolloUrl);
-			
-	    URL adrolloUrl = new URL(s_adrolloUrl);
-	    BufferedReader in = new BufferedReader(new InputStreamReader(adrolloUrl.openStream()));
+	    s_adrolloUrl = s_adrolloUrl.replaceAll("%", "|");
+
 	    StringBuffer mdotmJson = new StringBuffer();
-	    String inputLine;
-	    while ((inputLine = in.readLine()) != null) {
-		mdotmJson.append(inputLine);
+
+	    log.debug("Adrollo request to: " + s_adrolloUrl);
+	    long adrolloStart = System.currentTimeMillis();
+	    try {
+		URL adrolloUrl = new URL(s_adrolloUrl);
+		URLConnection adrolloUrlConnection = adrolloUrl.openConnection();
+		adrolloUrlConnection.setConnectTimeout(70);
+		adrolloUrlConnection.setReadTimeout(70);
+		BufferedReader in = new BufferedReader(new InputStreamReader(adrolloUrlConnection.getInputStream()));
+		String inputLine;
+		while ((inputLine = in.readLine()) != null) {
+		    mdotmJson.append(inputLine);
+		}
+		in.close();
 	    }
-	    in.close();
+	    catch(SocketTimeoutException e) {
+		log.error("Adrollo connect timed out.");
+	    }
+
+	    long adrolloEnd = System.currentTimeMillis();
+
+	    long adrolloTime = adrolloEnd - adrolloStart;
+
+	    log.info("Adrollo proxy took " + adrolloTime + " ms");
 
 	    if(!mdotmJson.toString().isEmpty() && !mdotmJson.toString().equals("[]")) {
 		JSONObject adrolloResponse;
