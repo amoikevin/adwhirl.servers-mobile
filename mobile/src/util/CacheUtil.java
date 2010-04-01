@@ -117,7 +117,7 @@ public class CacheUtil {
 								}
 							}
 							else {
-								log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
+								log.info("SELECT request pulled an unknown attribute <aid: " + aid + " + >: " + attributeName + "|" + attribute.getValue());
 							}
 						}
 						catch(NumberFormatException e) {
@@ -180,7 +180,7 @@ public class CacheUtil {
 										// We already know the aid.
 									}
 									else {
-										log.info("SELECT request pulled an unknown attribute: " + networkAttributeName + "|" + networkAttribute.getValue());
+										log.info("SELECT request pulled an unknown attribute <nid: " + nid + ">:" + networkAttributeName + "|" + networkAttribute.getValue());
 									}
 								}
 								catch(NumberFormatException e) {
@@ -742,7 +742,7 @@ public class CacheUtil {
 								}
 							}
 							else {
-								log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
+								log.info("SELECT request pulled an unknown attribute <cid: " + nid + ">: " + attributeName + "|" + attribute.getValue());
 							}
 						}
 						catch(NumberFormatException e) {
@@ -857,9 +857,6 @@ public class CacheUtil {
 									ration.setWeight(weight);
 								}
 							}
-							else {
-								log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
-							}
 						}
 						catch(NumberFormatException e) {
 							log.error("Invalid data for app custom <" + aid + ">: " + e.getMessage(), e);
@@ -909,9 +906,6 @@ public class CacheUtil {
 								ration.setNetworkKey(attribute.getValue());
 								break;
 							}
-						}
-						else {
-							log.info("SELECT request pulled an unknown attribute: " + attributeName + "|" + attribute.getValue());
 						}
 					}
 				}
