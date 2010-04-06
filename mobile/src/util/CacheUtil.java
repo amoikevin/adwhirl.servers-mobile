@@ -849,6 +849,8 @@ public class CacheUtil {
 			    continue;						
 			}
 
+			String nid = attribute.getName();
+
 			try {
 			    String attributeName = attribute.getName();		
 			    if(attributeName.equals("weight")) {
@@ -859,7 +861,7 @@ public class CacheUtil {
 			    }
 			}
 			catch(NumberFormatException e) {
-			    log.error("Invalid data for app custom <aid: " + aid + ">: " + e.getMessage(), e);
+			    log.error("Invalid data for app custom <nid: " + nid + ">", e);
 			}
 		    }
 
