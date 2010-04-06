@@ -859,7 +859,7 @@ public class CacheUtil {
 			    }
 			}
 			catch(NumberFormatException e) {
-			    log.error("Invalid data for app custom <" + aid + ">: " + e.getMessage(), e);
+			    log.error("Invalid data for app custom <aid: " + aid + ">: " + e.getMessage(), e);
 			}
 		    }
 
