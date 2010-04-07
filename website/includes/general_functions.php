@@ -151,7 +151,7 @@ function changeUser($uid, $email, $oldpassword, $newpassword, $allowEmails = 0)
     
     $aaa = 'itemName()';
 
-    if($sdb->select(DOMAIN_USERS, $aaa, "where `password` = '$oldpassword' limit 1")) {
+    if($sdb->select(DOMAIN_USERS, $aaa, "where itemName()='$uid' and `password` = '$oldpassword' limit 1")) {
       if(!empty($aaa)) {
 	if($aaa[0]['itemName()'] != $uid) {
 	  return false;
