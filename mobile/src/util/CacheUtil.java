@@ -521,71 +521,30 @@ public class CacheUtil {
 	JSONWriter jsonWriter = new JSONStringer();
 
 	jsonWriter = jsonWriter.array();
-	jsonWriter = jsonWriter.object();
-	int customWeight = 0;
-	for(Ration ration : rations) {
-	    if(ration.getNName().equals("custom")) {
-		customWeight += ration.getWeight();
-		continue;
-	    }
 
-	    // Takes care of MdotM legacy support
-	    String rationName;
-	    if(ration.getType() == AdWhirlUtil.NETWORKS.MDOTM.ordinal()) {
-		rationName = "adrollo";
-	    }
-	    else {
-		rationName = ration.getNName();
-	    }
-
-	    jsonWriter = jsonWriter.key(rationName + "_ration")
-		.value(ration.getWeight());
-
+	if(extra.getAdsOn() == 0) {
+	    jsonWriter = jsonWriter.object()
+		.key("empty_ration")
+		.value(100)
+		.endObject()
+		.object()
+		.key("empty_ration")
+		.value("empty_ration")
+		.endObject()
+		.object()
+		.key("empty_ration")
+		.value(1)
+		.endObject();
 	}
-	if(customWeight != 0) {
-	    jsonWriter = jsonWriter.key("custom_ration")
-		.value(customWeight);
-	}
-	jsonWriter = jsonWriter.endObject();
-
-	jsonWriter = jsonWriter.object();
-	for(Ration ration : rations) {			
-	    if(ration.getNName().equals("custom")) {
-		continue;
-	    }
-	    else if(ration.getType() == AdWhirlUtil.NETWORKS.VIDEOEGG.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-		    .object()
-		    .key("publisher")
-		    .value(temp[0])
-		    .key("area")
-		    .value(temp[1])
-		    .endObject();
-	    }
-	    else if(ration.getType() == AdWhirlUtil.NETWORKS.QUATTRO.ordinal()) {
-		String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
-
-		if(temp.length == 2) {
-		    jsonWriter = jsonWriter.key(ration.getNName() + "_key")
-			.object()
-			.key("siteID")
-			.value(temp[0])
-			.key("publisherID")
-			.value(temp[1])
-			.endObject();
+	else {
+	    jsonWriter = jsonWriter.object();
+	    int customWeight = 0;
+	    for(Ration ration : rations) {
+		if(ration.getNName().equals("custom")) {
+		    customWeight += ration.getWeight();
+		    continue;
 		}
-		else {
-
-		    jsonWriter = jsonWriter.object()
-			.key("appID")
-			.value(temp[0])
-			.endObject();
-		}
-
-	    }
-	    else {
+		
 		// Takes care of MdotM legacy support
 		String rationName;
 		if(ration.getType() == AdWhirlUtil.NETWORKS.MDOTM.ordinal()) {
@@ -595,44 +554,102 @@ public class CacheUtil {
 		    rationName = ration.getNName();
 		}
 
-		jsonWriter = jsonWriter.key(rationName + "_key")
-		    .value(ration.getNetworkKey());
+		jsonWriter = jsonWriter.key(rationName + "_ration")
+		    .value(ration.getWeight());
+
 	    }
-	}
+	    if(customWeight != 0) {
+		jsonWriter = jsonWriter.key("custom_ration")
+		    .value(customWeight);
+	    }
+	    jsonWriter = jsonWriter.endObject();
 
-	if(customWeight != 0) {
-	    jsonWriter = jsonWriter.key("dontcare_key")
-		.value(customWeight);
-	}
-	jsonWriter = jsonWriter.endObject();
-
-	jsonWriter = jsonWriter.object();
-	int customPriority = Integer.MAX_VALUE;
-	for(Ration ration : rations) {
-	    if(ration.getNName().equals("custom")) {
-		if(customPriority > ration.getPriority()) {
-		    customPriority = ration.getPriority();
+	    jsonWriter = jsonWriter.object();
+	    for(Ration ration : rations) {			
+		if(ration.getNName().equals("custom")) {
+		    continue;
 		}
-		continue;
+		else if(ration.getType() == AdWhirlUtil.NETWORKS.VIDEOEGG.ordinal()) {
+		    String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
+
+		    jsonWriter = jsonWriter.key(ration.getNName() + "_key")
+			.object()
+			.key("publisher")
+			.value(temp[0])
+			.key("area")
+			.value(temp[1])
+			.endObject();
+		}
+		else if(ration.getType() == AdWhirlUtil.NETWORKS.QUATTRO.ordinal()) {
+		    String[] temp = ration.getNetworkKey().split(AdWhirlUtil.KEY_SPLIT);
+
+		    if(temp.length == 2) {
+			jsonWriter = jsonWriter.key(ration.getNName() + "_key")
+			    .object()
+			    .key("siteID")
+			    .value(temp[0])
+			    .key("publisherID")
+			    .value(temp[1])
+			    .endObject();
+		    }
+		    else {
+
+			jsonWriter = jsonWriter.object()
+			    .key("appID")
+			    .value(temp[0])
+			    .endObject();
+		    }
+
+		}
+		else {
+		    // Takes care of MdotM legacy support
+		    String rationName;
+		    if(ration.getType() == AdWhirlUtil.NETWORKS.MDOTM.ordinal()) {
+			rationName = "adrollo";
+		    }
+		    else {
+			rationName = ration.getNName();
+		    }
+
+		    jsonWriter = jsonWriter.key(rationName + "_key")
+			.value(ration.getNetworkKey());
+		}
 	    }
 
-	    // Takes care of MdotM legacy support
-	    String rationName;
-	    if(ration.getType() == AdWhirlUtil.NETWORKS.MDOTM.ordinal()) {
-		rationName = "adrollo";
+	    if(customWeight != 0) {
+		jsonWriter = jsonWriter.key("dontcare_key")
+		    .value(customWeight);
 	    }
-	    else {
-		rationName = ration.getNName();
-	    }
+	    jsonWriter = jsonWriter.endObject();
 
-	    jsonWriter = jsonWriter.key(rationName + "_priority")
-		.value(ration.getPriority());
+	    jsonWriter = jsonWriter.object();
+	    int customPriority = Integer.MAX_VALUE;
+	    for(Ration ration : rations) {
+		if(ration.getNName().equals("custom")) {
+		    if(customPriority > ration.getPriority()) {
+			customPriority = ration.getPriority();
+		    }
+		    continue;
+		}
+
+		// Takes care of MdotM legacy support
+		String rationName;
+		if(ration.getType() == AdWhirlUtil.NETWORKS.MDOTM.ordinal()) {
+		    rationName = "adrollo";
+		}
+		else {
+		    rationName = ration.getNName();
+		}
+
+		jsonWriter = jsonWriter.key(rationName + "_priority")
+		    .value(ration.getPriority());
+	    }
+	    if(customWeight != 0) {
+		jsonWriter = jsonWriter.key("custom_priority")
+		    .value(customPriority);
+	    }
+	    jsonWriter = jsonWriter.endObject();
 	}
-	if(customWeight != 0) {
-	    jsonWriter = jsonWriter.key("custom_priority")
-		.value(customPriority);
-	}
-	jsonWriter = jsonWriter.endObject();
 
 	jsonWriter = jsonWriter.object()
 	    .key("background_color_rgb")
