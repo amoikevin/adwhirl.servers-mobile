@@ -76,10 +76,15 @@ public class InvalidateConfigsThread implements Runnable {
 			    List<Item> invalidsList = invalidsResult.getItem();
 				    
 				for(Item item : invalidsList) {
-					String aid = item.getName();
+				    String aid = item.getName();
+				    try {
 					log.info("Cached response for app <" + aid + "> may be invalid");
 					cacheUtil.loadApp(cache, aid);
 					cacheUtil.loadAdrollo(adrolloCache, aid);
+				    }
+				    catch(Exception e) {
+					log.error("Unable to update cache for <aid: " + aid + ">", e);
+				    }
 				}
 			}
 			catch(AmazonSimpleDBException e) {
