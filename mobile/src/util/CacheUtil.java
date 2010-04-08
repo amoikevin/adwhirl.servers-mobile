@@ -784,7 +784,9 @@ public class CacheUtil {
     }
 
     private void genJsonCustoms(Cache cache, String nid, CustomAd customAd) throws JSONException {
-	cache.put(new Element(nid + "_127", genJsonCustomV127(customAd)));	
+	if(customAd != null) {
+	    cache.put(new Element(nid + "_127", genJsonCustomV127(customAd)));	
+	}
     }
 
     private String genJsonCustomV127(CustomAd customAd) throws JSONException {
