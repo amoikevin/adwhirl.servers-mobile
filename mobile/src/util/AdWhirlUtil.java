@@ -59,7 +59,8 @@ public class AdWhirlUtil {
 	    GOOGLE_ADSENSE,
 	    GOOGLE_DOUBLECLICK,
 	    GENERIC,
-	    EVENT
+	    EVENT,
+	    INMOBI
 	    }
 
     public static String getNetworkPrefix(int type) {
@@ -98,6 +99,8 @@ public class AdWhirlUtil {
 	    return "generic";
 	case 17:
 	    return "event";
+	case 18:
+	    return "inmobi";
 	default:
 	    return "unknown";
 	}
