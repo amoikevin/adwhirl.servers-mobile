@@ -65,6 +65,10 @@ elif [ ${command} = 'stop' ]; then
   for pid in `ps auxww | grep java | grep -i adwhirl.jar | awk '{print $2}'`; do
     #use SIGINT so we can cleanup  
     sudo kill -2 $pid
+
+    sleep 15
+
+    sudo kill -9 $pid
   done
 
 else
