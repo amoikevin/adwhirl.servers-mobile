@@ -18,9 +18,11 @@ if [ ${command} = 'start' ]; then
     for pid in `ps auxww | grep java | grep -i adwhirl.jar | grep -i Invoker | grep -v Daemon | awk '{print $2}'`; do
       #use SIGINT so we can cleanup  
       sudo kill -2 $pid
-    done
 
-    sleep 15
+      sleep 15
+
+      sudo kill -9 $pid
+    done
 
     java -Xms256m -Xmx1024m -cp dist/adwhirl.jar Invoker >Invoker.log 2>Invoker.err &
 
