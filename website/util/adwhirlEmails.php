@@ -26,7 +26,7 @@ require_once('includes/inc_global_no_session.php');
 require_once('includes/SDB.php');
 chdir($dir);
 
-$to = 'jpincar@admob.com';
+$to = 'jpincar@admob.com,pfernandez@admob.com';
 
 $today = date('Y-m-d');
 $file = "adwhirl-emails_$today.csv";
@@ -41,11 +41,8 @@ $sdb->select(DOMAIN_USERS, $aaa, "");
 fputcsv($fh, array('email'));
 foreach($aaa as $aa) {
   $email = $aa['email'];
-  $allowEmail = $aa['allowEmail'];
 
-  if($allowEmail == '1') {
-    fputcsv($fh, array($email));
-  }
+  fputcsv($fh, array($email));
 }
 fclose($fh);
 

@@ -30,7 +30,7 @@ if($email == null || $oldpass == null || $newpass == null) {
   exit;
 }
 
-$allowEmails = isset($_POST['allowemails']) ? 1 : 0;
+$allowEmails = isset($_POST['allowemails']) ? 0 : 1;
 
 $numAffected = changeUser($uid, $email, $oldpass, $newpass, $allowEmails);
 

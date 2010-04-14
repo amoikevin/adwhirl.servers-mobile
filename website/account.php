@@ -130,17 +130,6 @@ $successMsg = '<div id="successMsg" class="successMsg">
 						</div>
 				</li>
 				
-				<li id="foli21" 		class="   ">
-	<label class="desc" id="title21" for="Field21">
-			</label>
-	<div class="column">
-		<input id="allowemails" 	name="allowemails" 		type="checkbox" 		class="field checkbox"		tabindex="4" 				<?php if($_SESSION['AllowEmails']==1) echo 'checked'; ?>	/>
-	<label class="choice" for="Field21">Notify me of AdWhirl updates</label>
-		</div>
-		<p class="instruct" id="instruct21"><small>We only send updates on new ad networks or new monetizing features for developers.</small></p>
-	</li>
-			
-				
 				<li class="buttons">
 							<input id="saveForm" class="btTxt" type="submit" value="Save Changes" />
 						</li>
