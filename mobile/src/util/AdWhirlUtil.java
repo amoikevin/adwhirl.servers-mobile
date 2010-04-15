@@ -61,7 +61,8 @@ public class AdWhirlUtil {
 	    GENERIC,
 	    EVENT,
 	    INMOBI,
-	    IAD
+	    IAD,
+	    ZESTADZ
 	    }
 
     public static String getNetworkPrefix(int type) {
@@ -104,6 +105,8 @@ public class AdWhirlUtil {
 	    return "inmobi";
 	case 19:
 	    return "iad";
+	case 20:
+	    return "zestadz";
 	default:
 	    return "unknown";
 	}
