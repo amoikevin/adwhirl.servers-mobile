@@ -133,7 +133,7 @@ namespace :deploy do
     dirs = [deploy_to, releases_path, shared_path]
     dirs += shared_children.map { |d| File.join(shared_path, d) }
     run "mkdir -p #{dirs.join(' ')} && chmod g+w #{dirs.join(' ')}"
-    run "mkdir /mnt/adwhirl"
+#    run "mkdir /mnt/adwhirl"
   end
 
   desc "Touches up the released code"
@@ -163,11 +163,12 @@ desc "Print Help"
 task :help do
   puts
   puts "Usage:"
-  puts "cap <staging/adwhirllb> <deploy/deploy:rollback> ..."
+  puts "cap <adwhirllb/staging/instance> <deploy/deploy:rollback> ..."
   puts
   puts "Some common use cases:"
   puts
   puts "cap adwhirllb deploy"
   puts "cap staging deploy"
+  puts "cap instance deploy -S instanceId=i-e57ce38d"
   puts
 end
