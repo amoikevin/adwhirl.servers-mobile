@@ -133,7 +133,7 @@ namespace :deploy do
     dirs = [deploy_to, releases_path, shared_path]
     dirs += shared_children.map { |d| File.join(shared_path, d) }
     run "mkdir -p #{dirs.join(' ')} && chmod g+w #{dirs.join(' ')}"
-#    run "mkdir /mnt/adwhirl"
+    run "mkdir /mnt/adwhirl"
   end
 
   desc "Touches up the released code"
@@ -147,13 +147,14 @@ namespace :deploy do
   end
 
   task :stop_server do
-    run "cd #{current_path} && nohup /bin/bash #{current_path}/#{application} stop_all ; exit 0"
+    run "cd #{current_path} && nohup /bin/bash #{current_path}/#{application} stop_invoker ; exit 0"
   end
 
   task :start_server do
     run "cd #{current_path} && nohup /bin/bash #{current_path}/#{application} start_invoker ; exit 0"
 
     if :instanceId == :daemon_instanceId
+      #and also stop_daemon
       puts "Starting Daemon on #{instanceId}"
     end
   end
