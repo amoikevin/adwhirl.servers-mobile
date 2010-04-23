@@ -22,32 +22,25 @@ import com.amazonaws.sdb.model.Item;
 
 import org.apache.log4j.Logger;
 
-import net.sf.ehcache.Cache;
-
 import util.CacheUtil;
 
 public class CacheCustomsLoaderThread implements Runnable {
 	static Logger log = Logger.getLogger("CacheCustomsLoaderThread");
 
-	private Cache cache;
-	
 	private List<Item> customsList;
 	private int threadId;
 	
 	public CacheCustomsLoaderThread(List<Item> customsList, int threadId) {
-		this.cache = CacheUtil.getCacheCustoms();
 	    this.customsList = customsList;
 	    this.threadId = threadId;
 	}
 	
 	public void run() {
-		log.debug("CacheCustomsLoaderThread<"+ threadId + "> started");
-			
-		CacheUtil cacheUtil = new CacheUtil();
+		log.info("CacheCustomsLoaderThread<"+ threadId + "> started");
 		
 		for(Item item : customsList) {
 			String nid = item.getName();		
-			cacheUtil.loadCustom(cache, nid);
+			CacheUtil.loadCustom(nid);
 		}
 	}
 }

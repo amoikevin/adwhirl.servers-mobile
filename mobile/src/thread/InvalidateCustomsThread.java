@@ -28,24 +28,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import net.sf.ehcache.Cache;
-
 import util.AdWhirlUtil;
 import util.CacheUtil;
 
 public class InvalidateCustomsThread implements Runnable {
 	static Logger log = Logger.getLogger("InvalidateCustomsThread");
 	
-	private Cache customsCache;
-	private Cache appCustomsCache;
-	private CacheUtil cacheUtil;
 	private static AmazonSimpleDB sdb;
 	
-	public InvalidateCustomsThread(Cache customsCache, Cache appCustomsCache) {
-		this.customsCache = customsCache;
-		this.appCustomsCache = appCustomsCache;
-		this.cacheUtil = new CacheUtil();
-	}
+	public InvalidateCustomsThread() {}
 	
 	public void run() {
 		log.info("InvalidateCustomsThread started");
@@ -79,7 +70,7 @@ public class InvalidateCustomsThread implements Runnable {
 				for(Item item : invalidsList) {
 					String nid = item.getName();
 					log.info("Cached response for custom <" + nid + "> may be invalid");
-					cacheUtil.loadCustom(customsCache, nid);
+					CacheUtil.loadCustom(nid);
 				}
 			}
 			catch(AmazonSimpleDBException e) {
@@ -107,7 +98,7 @@ public class InvalidateCustomsThread implements Runnable {
 				for(Item item : invalidsList) {
 					String aid = item.getName();
 					log.info("Cached response for app customs <" + aid + "> may be invalid");
-					cacheUtil.loadAppCustom(appCustomsCache, aid);
+					CacheUtil.loadAppCustom(aid);
 				}
 			}
 			catch(AmazonSimpleDBException e) {

@@ -51,9 +51,11 @@ public class CacheUtil {
 	private static AmazonSimpleDB sdb;
 	static Logger log = Logger.getLogger("ConfigServlet");
 
-	public CacheUtil() {
+	public static void initalize() {
 		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);	
-
+	}
+	
+	public static void preload() {
 		// This order is important - preloadConfigs() must come after preloadAppCustoms() has completed
 		preloadAppCustoms();
 		preloadCustoms();
@@ -62,7 +64,7 @@ public class CacheUtil {
 		Thread invalidater = new Thread(new InvalidateConfigsThread());
 	    invalidater.start();
 	    
-	    Thread customsInvalidater = new Thread(new InvalidateCustomsThread(CacheUtil.getCacheCustoms(), CacheUtil.getCacheAppCustoms()));
+	    Thread customsInvalidater = new Thread(new InvalidateCustomsThread());
 	    customsInvalidater.start();
 	}
 
@@ -100,7 +102,7 @@ public class CacheUtil {
 		return getCache("legacyHitsCache");
 	}
 	
-	private void preloadConfigs() {
+	private static void preloadConfigs() {
 		List<Thread> threads = new ArrayList<Thread>();
 
 		int threadId = 1;
@@ -132,7 +134,7 @@ public class CacheUtil {
 	    }
 	}
 
-	private void preloadCustoms() {
+	private static void preloadCustoms() {
 		List<Thread> threads = new ArrayList<Thread>();
 		
 		int threadId = 1;
@@ -164,7 +166,7 @@ public class CacheUtil {
 	    }
 	}
 	
-	private void preloadAppCustoms() {
+	private static void preloadAppCustoms() {
 		List<Thread> threads = new ArrayList<Thread>();
 		
 		int threadId = 1;
@@ -196,10 +198,10 @@ public class CacheUtil {
 	    }
 	}
 
-	public void loadApp(Cache cache, String aid) {
-		log.debug("Loading app <" + aid + "> into the cache");
+	public static void loadApp(String aid) {
+		log.info("Loading app <" + aid + "> into the cache");
 		
-		Cache appCustomCache = CacheUtil.getCacheAppCustoms();
+		Cache appCustomCache = getCacheAppCustoms();
 
 		Extra extra = null;
 		List<Ration> rations = null;
@@ -371,7 +373,7 @@ public class CacheUtil {
 		}
 
 		try {
-			genJsonConfigs(cache, aid, extra, rations);
+			genJsonConfigs(getCacheConfigs(), aid, extra, rations);
 		} 
 		catch (JSONException e) {
 			log.error("Error creating jsonConfig for aid <"+ aid +">: " + e.getMessage());
@@ -379,13 +381,13 @@ public class CacheUtil {
 	}
 
 
-	private void genJsonConfigs(Cache cache, String aid, Extra extra, List<Ration> rations) throws JSONException {
+	private static void genJsonConfigs(Cache cache, String aid, Extra extra, List<Ration> rations) throws JSONException {
 		cache.put(new Element(aid + "_200", genJsonConfigV200(extra, rations)));
 		cache.put(new Element(aid + "_127", genJsonConfigV127(extra, rations)));
 		cache.put(new Element(aid + "_103", genJsonConfigV103(extra, rations)));	
 	}
 
-	private String genJsonConfigV200(Extra extra, List<Ration> rations) throws JSONException {		
+	private static String genJsonConfigV200(Extra extra, List<Ration> rations) throws JSONException {		
 		JSONWriter jsonWriter = new JSONStringer();
 
 		if(extra.getAdsOn() == 0) {
@@ -498,7 +500,7 @@ public class CacheUtil {
 	}
 
 	//Legacy support
-	private String genJsonConfigV127(Extra extra, List<Ration> rations) throws JSONException {
+	private static String genJsonConfigV127(Extra extra, List<Ration> rations) throws JSONException {
 		JSONWriter jsonWriter = new JSONStringer();
 
 		jsonWriter = jsonWriter.array();
@@ -693,7 +695,7 @@ public class CacheUtil {
 	}
 
 	//Legacy support
-	private String genJsonConfigV103(Extra extra, List<Ration> rations) throws JSONException {
+	private static String genJsonConfigV103(Extra extra, List<Ration> rations) throws JSONException {
 		JSONWriter jsonWriter = new JSONStringer();
 
 		jsonWriter = jsonWriter.array();
@@ -874,8 +876,8 @@ public class CacheUtil {
 		return jsonWriter.endArray().toString();
 	}
 
-	public void loadCustom(Cache cache, String nid) {
-		log.debug("Loading custom <" + nid + "> into the cache");
+	public static void loadCustom(String nid) {
+		log.info("Loading custom <" + nid + "> into the cache");
 
 		CustomAd customAd = null;
 
@@ -957,20 +959,20 @@ public class CacheUtil {
 		}
 
 		try {
-			genJsonCustoms(cache, nid, customAd);
+			genJsonCustoms(getCacheCustoms(), nid, customAd);
 		} catch (JSONException e) {
 			log.error("Error creating jsonConfig: " + e.getMessage());
 			return;
 		}
 	}
 
-	private void genJsonCustoms(Cache cache, String nid, CustomAd customAd) throws JSONException {
+	private static void genJsonCustoms(Cache cache, String nid, CustomAd customAd) throws JSONException {
 		if(customAd != null) {
 			cache.put(new Element(nid + "_127", genJsonCustomV127(customAd)));	
 		}
 	}
 
-	private String genJsonCustomV127(CustomAd customAd) throws JSONException {
+	private static String genJsonCustomV127(CustomAd customAd) throws JSONException {
 		JSONWriter jsonWriter = new JSONStringer();
 
 		int launch_type;
@@ -1022,8 +1024,8 @@ public class CacheUtil {
 	}
 
 
-	public void loadAppCustom(Cache cache, String aid) {
-		log.debug("Loading app customs for <aid:" + aid + "> into the cache");
+	public static void loadAppCustom(String aid) {
+		log.info("Loading app customs for <aid:" + aid + "> into the cache");
 
 		List<Ration> rations = null;
 
@@ -1083,11 +1085,12 @@ public class CacheUtil {
 			}	
 		}
 
+		Cache cache = getCacheAppCustoms();
 		cache.put(new Element(aid, rations));	
 	}
 
-	public void loadAdrollo(Cache cache, String aid) {
-		log.debug("Loading adrollo for <" + aid + "> into the cache");
+	public static void loadAdrollo(String aid) {
+		log.info("Loading adrollo for <" + aid + "> into the cache");
 
 		Ration ration = null;
 
@@ -1129,6 +1132,7 @@ public class CacheUtil {
 			}	
 		}
 
+		Cache cache = getCacheAdrollo();
 		cache.put(new Element(aid, ration));
 	}
 }

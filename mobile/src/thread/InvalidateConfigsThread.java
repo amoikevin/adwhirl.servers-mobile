@@ -28,24 +28,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import net.sf.ehcache.Cache;
-
 import util.AdWhirlUtil;
 import util.CacheUtil;
 
 public class InvalidateConfigsThread implements Runnable {
 	static Logger log = Logger.getLogger("InvalidateConfigsThread");
 	
-	private Cache configsCache;
-    private Cache adrolloCache;
-	private CacheUtil cacheUtil;
 	private static AmazonSimpleDB sdb;
 	
-    public InvalidateConfigsThread() {
-		this.configsCache = CacheUtil.getCacheConfigs();
-		this.adrolloCache = CacheUtil.getCacheAdrollo();
-		this.cacheUtil = new CacheUtil();
-	}
+    public InvalidateConfigsThread() {}
 	
 	public void run() {
 		log.info("InvalidateConfigsThread started");
@@ -79,8 +70,8 @@ public class InvalidateConfigsThread implements Runnable {
 				    String aid = item.getName();
 				    try {
 					log.info("Cached response for app <" + aid + "> may be invalid");
-					cacheUtil.loadApp(configsCache, aid);
-					cacheUtil.loadAdrollo(adrolloCache, aid);
+					CacheUtil.loadApp(aid);
+					CacheUtil.loadAdrollo(aid);
 				    }
 				    catch(Exception e) {
 					log.error("Unable to update cache for <aid: " + aid + ">", e);
