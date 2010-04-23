@@ -112,20 +112,26 @@ public class AdrolloServlet extends HttpServlet {
 
 	    log.debug("Adrollo request to: " + s_adrolloUrl);
 	    long adrolloStart = System.currentTimeMillis();
+
+	    BufferedReader in = null;
 	    try {
 		URL adrolloUrl = new URL(s_adrolloUrl);
 		URLConnection adrolloUrlConnection = adrolloUrl.openConnection();
 		adrolloUrlConnection.setConnectTimeout(70);
 		adrolloUrlConnection.setReadTimeout(70);
-		BufferedReader in = new BufferedReader(new InputStreamReader(adrolloUrlConnection.getInputStream()));
+		in = new BufferedReader(new InputStreamReader(adrolloUrlConnection.getInputStream()));
 		String inputLine;
 		while ((inputLine = in.readLine()) != null) {
 		    mdotmJson.append(inputLine);
 		}
-		in.close();
 	    }
 	    catch(SocketTimeoutException e) {
 		log.info("Adrollo connect timed out.");
+	    }
+	    finally {
+		if(in != null) {
+		    in.close();
+		}
 	    }
 
 	    long adrolloEnd = System.currentTimeMillis();
