@@ -99,6 +99,8 @@ public class InvalidateCustomsThread implements Runnable {
 					String aid = item.getName();
 					log.info("Cached response for app customs <" + aid + "> may be invalid");
 					CacheUtil.loadAppCustom(aid);
+					// Since the app config uses the app custom config we have to load it again
+					CacheUtil.loadAdd(aid);
 				}
 			}
 			catch(AmazonSimpleDBException e) {

@@ -49,7 +49,7 @@ import com.amazonaws.sdb.util.AmazonSimpleDBUtil;
 
 public class CacheUtil {
 	private static AmazonSimpleDB sdb;
-	static Logger log = Logger.getLogger("ConfigServlet");
+    static Logger log = Logger.getLogger("CacheUtil");
 
 	public static void initalize() {
 		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);	
@@ -199,7 +199,7 @@ public class CacheUtil {
 	}
 
 	public static void loadApp(String aid) {
-		log.info("Loading app <" + aid + "> into the cache");
+		log.debug("Loading app <" + aid + "> into the cache");
 		
 		Cache appCustomCache = getCacheAppCustoms();
 
@@ -877,7 +877,7 @@ public class CacheUtil {
 	}
 
 	public static void loadCustom(String nid) {
-		log.info("Loading custom <" + nid + "> into the cache");
+		log.debug("Loading custom <" + nid + "> into the cache");
 
 		CustomAd customAd = null;
 
@@ -940,6 +940,9 @@ public class CacheUtil {
 								if(attribute.isSetValue()) {
 									customAd.setLaunchType(attribute.getValue());
 								}
+							}
+							else if(attributeName.equals("uid")) {
+							    //Ignore
 							}
 							else {
 								log.info("SELECT request pulled an unknown attribute <cid: " + nid + ">: " + attributeName + "|" + attribute.getValue());
@@ -1025,7 +1028,7 @@ public class CacheUtil {
 
 
 	public static void loadAppCustom(String aid) {
-		log.info("Loading app customs for <aid:" + aid + "> into the cache");
+		log.debug("Loading app customs for <aid:" + aid + "> into the cache");
 
 		List<Ration> rations = null;
 
@@ -1034,7 +1037,8 @@ public class CacheUtil {
 			rations = new ArrayList<Ration>();
 
 			//Get weights for custom networks of aid
-			String select = "select `weight` from `" + AdWhirlUtil.DOMAIN_APP_CUSTOMS + "` where `aid` = '" + aid + "'";
+			//TODO - we shouldn't need "is null"
+			String select = "select `weight`, `cid` from `" + AdWhirlUtil.DOMAIN_APP_CUSTOMS + "` where `aid` = '" + aid + "' and `deleted` is null";
 
 			SelectRequest request = new SelectRequest(select, null);
 			try {
@@ -1090,7 +1094,7 @@ public class CacheUtil {
 	}
 
 	public static void loadAdrollo(String aid) {
-		log.info("Loading adrollo for <" + aid + "> into the cache");
+		log.debug("Loading adrollo for <" + aid + "> into the cache");
 
 		Ration ration = null;
 

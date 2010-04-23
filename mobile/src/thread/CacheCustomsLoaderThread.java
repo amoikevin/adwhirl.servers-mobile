@@ -36,7 +36,7 @@ public class CacheCustomsLoaderThread implements Runnable {
 	}
 	
 	public void run() {
-		log.info("CacheCustomsLoaderThread<"+ threadId + "> started");
+	    log.debug("CacheCustomsLoaderThread<"+ threadId + "> started");
 		
 		for(Item item : customsList) {
 			String nid = item.getName();		

@@ -32,7 +32,9 @@ import servlet.ConfigServlet;
 import servlet.CustomsServlet;
 import servlet.HealthCheckServlet;
 import servlet.MetricsServlet;
+
 import util.AdWhirlUtil;
+import util.CacheUtil;
 
 public class Invoker {
 	static Logger log = Logger.getLogger("Invoker");
@@ -50,6 +52,9 @@ public class Invoker {
 			System.exit(0);
 		}
 		*/
+
+		CacheUtil.initalize();
+		CacheUtil.preload();
 
 		Server server = new Server(8080);
 		try {

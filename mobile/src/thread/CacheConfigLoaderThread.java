@@ -36,7 +36,7 @@ public class CacheConfigLoaderThread implements Runnable {
 	}
 	
 	public void run() {
-	    log.info("PreloadThread<"+ threadId + "> started");
+	    log.debug("PreloadThread<"+ threadId + "> started");
 					
 		for(Item item : appsList) {
 			String aid = item.getName();
