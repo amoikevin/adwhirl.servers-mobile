@@ -945,7 +945,10 @@ public class CacheUtil {
 								}
 							}
 							else if(attributeName.equals("uid")) {
-							    //Ignore
+							    // We don't care who this belongs to
+							}
+							else if(attributeName.equals("deleted")) {
+							    // We don't care when it was deleted
 							}
 							else if(attributeName.equals("Sdb-item-identifier")) {
 								// Just means it's been edited by SDBExplorer, ignore.
