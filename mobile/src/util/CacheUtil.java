@@ -103,6 +103,8 @@ public class CacheUtil {
 	}
 	
 	private static void preloadConfigs() {
+		log.info("Preloading configs...");
+		
 		List<Thread> threads = new ArrayList<Thread>();
 
 		int threadId = 1;
@@ -135,6 +137,8 @@ public class CacheUtil {
 	}
 
 	private static void preloadCustoms() {
+		log.info("Preloading customs...");
+		
 		List<Thread> threads = new ArrayList<Thread>();
 		
 		int threadId = 1;
@@ -167,6 +171,8 @@ public class CacheUtil {
 	}
 	
 	private static void preloadAppCustoms() {
+		log.info("Preloading app customs...");
+		
 		List<Thread> threads = new ArrayList<Thread>();
 		
 		int threadId = 1;
