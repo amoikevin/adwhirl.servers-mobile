@@ -331,6 +331,9 @@ public class CacheUtil {
 									else if(networkAttributeName.equals("aid")) {
 										// We already know the aid.
 									}
+									else if(networkAttributeName.equals("Sdb-item-identifier")) {
+										// Just means it's been edited by SDBExplorer, ignore.
+									}
 									else {
 										log.info("SELECT request pulled an unknown attribute <nid: " + nid + ">:" + networkAttributeName + "|" + networkAttribute.getValue());
 									}
@@ -943,6 +946,9 @@ public class CacheUtil {
 							}
 							else if(attributeName.equals("uid")) {
 							    //Ignore
+							}
+							else if(attributeName.equals("Sdb-item-identifier")) {
+								// Just means it's been edited by SDBExplorer, ignore.
 							}
 							else {
 								log.info("SELECT request pulled an unknown attribute <cid: " + nid + ">: " + attributeName + "|" + attribute.getValue());
