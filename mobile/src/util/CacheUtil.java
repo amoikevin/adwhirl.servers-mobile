@@ -114,7 +114,7 @@ public class CacheUtil {
 			    SelectResult appsResult = appsResponse.getSelectResult();
 			    appsNextToken = appsResult.getNextToken();
 			    List<Item> appsList = appsResult.getItem();
-				    
+				
 			    Thread thread = new Thread(new CacheConfigLoaderThread(appsList, threadId++));
 			    threads.add(thread);
 			    thread.start();
@@ -1049,16 +1049,18 @@ public class CacheUtil {
 				for(Item item : list) {	
 					Ration ration = new Ration();
 
+					String acid = item.getName();
+
 					List<Attribute> attributeList = item.getAttribute();
 					for(Attribute attribute : attributeList) {
 						if(!attribute.isSetName()) {
 							continue;						
 						}
-
-						String acid = attribute.getName();
-
+						
+						String attributeName = null;
+						
 						try {
-							String attributeName = attribute.getName();		
+							attributeName = attribute.getName();		
 							if(attributeName.equals("weight")) {
 								if(attribute.isSetValue()) {
 									int weight = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
@@ -1073,7 +1075,7 @@ public class CacheUtil {
 							}
 						}
 						catch(NumberFormatException e) {
-							log.error("Invalid data for app custom <acid: " + acid + ">", e);
+							log.error("Invalid data for app custom <acid: " + acid + ">: " + attributeName, e);
 						}
 					}
 
