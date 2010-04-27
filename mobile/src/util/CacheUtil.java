@@ -396,6 +396,17 @@ public class CacheUtil {
 
 	private static void genJsonConfigs(Cache cache, String aid, Extra extra, List<Ration> rations) throws JSONException {
 		cache.put(new Element(aid + "_200", genJsonConfigV200(extra, rations)));
+		
+		// Types over 16 only supported in 2.x
+		Iterator<Ration> i = rations.iterator(); 
+		while(i.hasNext()) {
+			Ration ration = i.next();
+			
+			if(ration.getType() > 16) {
+				i.remove();
+			}
+		}
+		
 		cache.put(new Element(aid + "_127", genJsonConfigV127(extra, rations)));
 		cache.put(new Element(aid + "_103", genJsonConfigV103(extra, rations)));	
 	}
@@ -514,16 +525,6 @@ public class CacheUtil {
 
 	//Legacy support
 	private static String genJsonConfigV127(Extra extra, List<Ration> rations) throws JSONException {
-		// Types over 16 only supported in 2.x
-		Iterator<Ration> i = rations.iterator(); 
-		while(i.hasNext()) {
-			Ration ration = i.next();
-			
-			if(ration.getType() > 16) {
-				i.remove();
-			}
-		}
-		
 		JSONWriter jsonWriter = new JSONStringer();
 
 		jsonWriter = jsonWriter.array();
@@ -714,16 +715,6 @@ public class CacheUtil {
 
 	//Legacy support
 	private static String genJsonConfigV103(Extra extra, List<Ration> rations) throws JSONException {
-		// Types over 16 only supported in 2.x
-		Iterator<Ration> i = rations.iterator(); 
-		while(i.hasNext()) {
-			Ration ration = i.next();
-			
-			if(ration.getType() > 16) {
-				i.remove();
-			}
-		}
-		
 		JSONWriter jsonWriter = new JSONStringer();
 
 		jsonWriter = jsonWriter.array();
