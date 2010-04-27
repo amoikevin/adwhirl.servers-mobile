@@ -97,6 +97,7 @@ public class Invoker {
 
 	@SuppressWarnings("unused")
 	private static void setupSimpleDB() throws AmazonSimpleDBException {
+		createDomain(AdWhirlUtil.DOMAIN_APP_CUSTOMS);
 		createDomain(AdWhirlUtil.DOMAIN_APPS);
 		createDomain(AdWhirlUtil.DOMAIN_APPS_INVALID);
 		createDomain(AdWhirlUtil.DOMAIN_NETWORKS);
