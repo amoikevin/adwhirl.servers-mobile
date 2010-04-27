@@ -26,6 +26,7 @@ import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.handler.RequestLogHandler;
 import org.mortbay.jetty.servlet.*;
+import org.mortbay.thread.QueuedThreadPool;
 
 import servlet.AdrolloServlet;
 import servlet.ConfigServlet;
@@ -57,6 +58,13 @@ public class Invoker {
 		CacheUtil.preload();
 
 		Server server = new Server(8080);
+		/*
+		QueuedThreadPool threadPool = new QueuedThreadPool();
+		threadPool.setMinThreads(10);
+		threadPool.setMaxThreads(100);
+		server.setThreadPool(threadPool);
+		*/
+		
 		try {
 			HandlerCollection handlers = new HandlerCollection();
 			ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();

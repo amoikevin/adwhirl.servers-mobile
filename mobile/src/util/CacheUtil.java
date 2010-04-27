@@ -386,6 +386,9 @@ public class CacheUtil {
 		} 
 		catch (JSONException e) {
 			log.error("Error creating jsonConfig for aid <"+ aid +">: " + e.getMessage());
+			for(Ration ration : rations) {
+				log.info(ration.toString());
+			}
 		}
 	}
 

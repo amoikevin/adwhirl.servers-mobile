@@ -72,4 +72,17 @@ public class Ration {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("Ration: ");
+		sb.append("\tNID: " + this.nid);
+		sb.append("\tType: " + this.type);
+		sb.append("\tNName: " + this.nname);
+		sb.append("\tKey: " + this.networkKey);
+		sb.append("\tWeight: " + this.weight);
+		sb.append("\tPriority: " + this.priority);
+		
+		return sb.toString();
+	}
 }
