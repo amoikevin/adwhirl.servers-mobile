@@ -17,6 +17,7 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
@@ -513,6 +514,16 @@ public class CacheUtil {
 
 	//Legacy support
 	private static String genJsonConfigV127(Extra extra, List<Ration> rations) throws JSONException {
+		// Types over 16 only supported in 2.x
+		Iterator<Ration> i = rations.iterator(); 
+		while(i.hasNext()) {
+			Ration ration = i.next();
+			
+			if(ration.getType() > 16) {
+				i.remove();
+			}
+		}
+		
 		JSONWriter jsonWriter = new JSONStringer();
 
 		jsonWriter = jsonWriter.array();
@@ -535,11 +546,6 @@ public class CacheUtil {
 			jsonWriter = jsonWriter.object();
 			int customWeight = 0;
 			for(Ration ration : rations) {
-				if(ration.getType() > 16) {
-					// Types over 16 only supported in 2.x
-					continue;	
-				}
-				
 				if(ration.getNName().equals("custom")) {
 					customWeight += ration.getWeight();
 					continue;
@@ -708,6 +714,16 @@ public class CacheUtil {
 
 	//Legacy support
 	private static String genJsonConfigV103(Extra extra, List<Ration> rations) throws JSONException {
+		// Types over 16 only supported in 2.x
+		Iterator<Ration> i = rations.iterator(); 
+		while(i.hasNext()) {
+			Ration ration = i.next();
+			
+			if(ration.getType() > 16) {
+				i.remove();
+			}
+		}
+		
 		JSONWriter jsonWriter = new JSONStringer();
 
 		jsonWriter = jsonWriter.array();
@@ -730,11 +746,6 @@ public class CacheUtil {
 			jsonWriter = jsonWriter.object();
 			int customWeight = 0;
 			for(Ration ration : rations) {
-				if(ration.getType() > 16) {
-					// Types over 16 only supported in 2.x
-					continue;	
-				}
-				
 				if(ration.getNName().equals("custom")) {
 					customWeight += ration.getWeight();
 					continue;
