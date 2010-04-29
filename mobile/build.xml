@@ -32,6 +32,7 @@ limitations under the License.
 
   <property name="build.dir" value="bin" />
   <property name="source.dir" value="src" />
+  <property name="scripts.dir" value="scripts" />
   <property name="lib.dir" value="lib" />
 
   <path id="adwhirl.classpath">
@@ -96,6 +97,11 @@ limitations under the License.
     <!-- Package the Jar -->
     <mkdir dir="${dist.dir}" />
     
+    <!-- Copy scripts -->
+    <copy todir="${dist.dir}">
+      <fileset dir="${scripts.dir}" includes="**/*" />
+    </copy>    
+
     <!-- Package the distribution Jar -->
     <jar destfile="${jar.file}">
 
