@@ -72,7 +72,7 @@ public class Invoker {
 	        
 	        // CustomsServlet must be added before ConfigServlet
 			servletContext.addServlet(new ServletHolder(new	CustomsServlet()), "/custom.php");
-	        servletContext.addServlet(new ServletHolder(new	ConfigServlet()), "/getInfo.php");
+			servletContext.addServlet(new ServletHolder(new	ConfigServlet()), "/getInfo.php");
 			servletContext.addServlet(new ServletHolder(new	AdrolloServlet()), "/adrollo.php");
 			ServletHolder metricsServletHolder = new ServletHolder(new MetricsServlet());
 			servletContext.addServlet(metricsServletHolder, "/exmet.php");
