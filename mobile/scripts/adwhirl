@@ -1,79 +1,74 @@
 #!/bin/bash
 
-if [ $# -gt 1 ] || [ $# -eq 0 ]; then
-  echo 'Usage: adwhirl [start|daemon|stop]'
-  echo '    start  - Starts AdWhirl Invoker'
-  echo '    daemon - Starts AdWhirl Daemon'
-  echo '    stop   - Stops all AdWhirl Services'
+function print_help {
+  echo 'Usage: adwhirl [start_invoker|start_daemon|stop_invoker|stop_daemon|stop_all]'
+  echo ''
   exit 1
+}
+
+
+if [ $# -gt 1 ] || [ $# -eq 0 ]; then
+    print_help
 fi
 
 command=$1
 
-if [ ${command} = 'start' ]; then
-  # attempt to restart/start 1 time
-  cnt=0
-  while [ $cnt -lt 1 ];
-  do
+function start_invoker {
+    ulimit -n 819200
+
+    java -server -Xms256m -Xmx1024m -cp adwhirl.jar Invoker >Invoker.log 2>Invoker.err &
+
+    sleep 120
+}
+
+function start_daemon {
+   java -server -cp adwhirl.jar Daemon >Daemon.log 2>Daemon.err &
+   
+   sleep 30
+}
+
+function stop_invoker {
     for pid in `ps auxww | grep java | grep -i adwhirl.jar | grep -i Invoker | grep -v Daemon | awk '{print $2}'`; do
-      #use SIGINT so we can cleanup  
-      sudo kill -2 $pid
-
-      sleep 15
-
-      sudo kill -9 $pid
+	kill -15 $pid
     done
-
-    java -Xms256m -Xmx1024m -cp dist/adwhirl.jar Invoker >Invoker.log 2>Invoker.err &
-
+    
     sleep 30
     
-    echo "^]quit" | telnet localhost 80 1>/dev/null 2>/dev/null
-
-    if [ $? -eq 0 ];
-    then
-      break
-    fi
-
-    let cnt=cnt+1
-  done
-
-elif [ ${command} = 'daemon' ]; then
-  # attempt to restart/start 1 time
-  cnt=0
-  while [ $cnt -lt 1 ];
-  do
-    for pid in `ps auxww | grep java | grep -i adwhirl.jar | grep -i Daemon | grep -v Invoker | awk '{print $2}'`; do
-      #use SIGINT so we can cleanup  
-      sudo kill -2 $pid
+    for pid in `ps auxww | grep java | grep -i adwhirl.jar | grep -i Invoker | grep -v Daemon | awk '{print $2}'`; do
+	kill -9 $pid
     done
+}
 
-    sleep 15
-
-    java -cp dist/adwhirl.jar Daemon >Daemon.log 2>Daemon.err &
-
-    sleep 15
+function stop_daemon {
+    for pid in `ps auxww | grep java | grep -i adwhirl.jar | grep -i Daemon | grep -v Invoker | awk '{print $2}'`; do
+	kill -15 $pid
+    done
+    
+    sleep 10
     
     for pid in `ps auxww | grep java | grep -i adwhirl.jar | grep -i Daemon | grep -v Invoker | awk '{print $2}'`; do
-	break
+	kill -9 $pid
     done
+}
 
-    let cnt=cnt+1
-  done
+if [ ${command} = 'start_invoker' ]; then
+    start_invoker
 
-elif [ ${command} = 'stop' ]; then
-  for pid in `ps auxww | grep java | grep -i adwhirl.jar | awk '{print $2}'`; do
-    #use SIGINT so we can cleanup  
-    sudo kill -2 $pid
-  done
+elif [ ${command} = 'start_daemon' ]; then
+    start_daemon
+
+elif [ ${command} = 'stop_invoker' ]; then
+    stop_invoker
+
+elif [ ${command} = 'stop_daemon' ]; then
+    stop_daemon
+
+elif [ ${command} = 'stop_all' ]; then
+    stop_invoker
+    stop_daemon
 
 else
-  echo 'Usage: adwhirl [start|daemon|stop]'
-  echo '    start  - Starts AdWhirl Invoker'
-  echo '    daemon - Starts AdWhirl Daemon'
-  echo '    stop   - Stops all AdWhirl Services'
-  exit 1
-
+    print_help
 fi
 
 exit 0

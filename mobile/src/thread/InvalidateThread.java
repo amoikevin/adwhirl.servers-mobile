@@ -93,13 +93,13 @@ public class InvalidateThread implements Runnable {
 				for(Item item : invalidsList) {
 					String aid = item.getName();
 					log.info("Cached response for app customs <" + aid + "> may be invalid");
+					CacheUtil.loadAdrollo(aid);
 					CacheUtil.loadAppCustom(aid);
-					// Since the app config uses the app custom config we have to load it again
-					CacheUtil.loadAdd(aid);
+					CacheUtil.loadApp(aid);
 				}
 			}
 			catch(Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;

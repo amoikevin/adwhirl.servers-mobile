@@ -46,166 +46,161 @@ import util.AdWhirlUtil;
 import util.CacheUtil;
 
 public class AdrolloServlet extends HttpServlet {
-    private static final long serialVersionUID = 5325239757865054869L;
+	private static final long serialVersionUID = 5325239757865054869L;
 
-    static Logger log = Logger.getLogger("AdrolloServlet");
+	static Logger log = Logger.getLogger("AdrolloServlet");
 
-    //We only want one instance of the cache and db client per instance
-    private static Cache cache;
+	//We only want one instance of the cache and db client per instance
+	private static Cache cache;
 
-    public void init(ServletConfig servletConfig) throws ServletException {
-	String cacheName = "adrolloRations";
-	cache = CacheManager.getInstance().getCache(cacheName);
-	if(cache == null) {
-	    log.fatal("Unable to initialize cache \"" + cacheName + "\"");
-	    System.exit(0);
+	public void init(ServletConfig servletConfig) throws ServletException {
+		cache = CacheUtil.getCacheAdrollo();
 	}
 
-	log.info("Adrollo servlet initialized completed");
-    }
+	protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
+		String jsonAdrollo = null;
 
-    protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
-	String jsonAdrollo = null;
+		String aid = httpServletRequest.getParameter("appid");
+		if(aid == null || aid.isEmpty()) {	
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required.");
+			return;
+		}		
+		aid = aid.trim().replaceAll("%20", "");
 
-	String aid = httpServletRequest.getParameter("appid");
-	if(aid == null || aid.isEmpty()) {	
-	    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <appid> is required.");
-	    return;
-	}		
-	aid = aid.trim().replaceAll("%20", "");
+		String locale = httpServletRequest.getParameter("country_code");
+		if(locale == null || locale.isEmpty()) {	
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <country_code> is required.");
+			return;
+		}	
 
-	String locale = httpServletRequest.getParameter("country_code");
-	if(locale == null || locale.isEmpty()) {	
-	    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <country_code> is required.");
-	    return;
-	}	
+		String uuid = httpServletRequest.getParameter("uuid");
+		if(uuid == null || uuid.isEmpty()) {	
+			httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <uuid> is required.");
+			return;
+		}		
 
-	String uuid = httpServletRequest.getParameter("uuid");
-	if(uuid == null || uuid.isEmpty()) {	
-	    httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <uuid> is required.");
-	    return;
-	}		
+		//		String clientIP = httpServletRequest.getRemoteAddr();
+		String clientIP = httpServletRequest.getHeader("X-Forwarded-For");
 
-	//		String clientIP = httpServletRequest.getRemoteAddr();
-	String clientIP = httpServletRequest.getHeader("X-Forwarded-For");
+		String key = aid;
 
-	String key = aid;
+		Ration adrolloRation = null;
 
-	Ration adrolloRation = null;
-
-	Element cachedRation = cache.get(key);
-	if(cachedRation != null) {
-	    log.debug("Cache hit on \"" + key + "\"");
-	    adrolloRation = (Ration)cachedRation.getObjectValue();
-	}
-	else {
-	    log.warn("Cache miss on \"" + key + "\"");
-	    adrolloRation = null;
-	}
-
-	if(adrolloRation != null) {
-	    String s_adrolloUrl = String.format("http://ads.mdotm.com/ads/feed.php?key=%s&deviceid=%s&width=320&height=50&platform=iphone&fmt=json&appkey=%s&clientip=%s", adrolloRation.getNetworkKey(), uuid, aid, clientIP);
-	    s_adrolloUrl = s_adrolloUrl.replaceAll("%", "|");
-
-	    StringBuffer mdotmJson = new StringBuffer();
-
-	    log.debug("Adrollo request to: " + s_adrolloUrl);
-	    long adrolloStart = System.currentTimeMillis();
-
-	    BufferedReader in = null;
-	    try {
-		URL adrolloUrl = new URL(s_adrolloUrl);
-		URLConnection adrolloUrlConnection = adrolloUrl.openConnection();
-		adrolloUrlConnection.setConnectTimeout(70);
-		adrolloUrlConnection.setReadTimeout(70);
-		in = new BufferedReader(new InputStreamReader(adrolloUrlConnection.getInputStream()));
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-		    mdotmJson.append(inputLine);
+		Element cachedRation = cache.get(key);
+		if(cachedRation != null) {
+			log.debug("Cache hit on \"" + key + "\"");
+			adrolloRation = (Ration)cachedRation.getObjectValue();
 		}
-	    }
-	    catch(SocketTimeoutException e) {
-		log.info("Adrollo connect timed out.");
-	    }
-	    finally {
-		if(in != null) {
-		    in.close();
+		else {
+			log.warn("Cache miss on \"" + key + "\"");
+			adrolloRation = null;
 		}
-	    }
 
-	    long adrolloEnd = System.currentTimeMillis();
+		if(adrolloRation != null) {
+			String s_adrolloUrl = String.format("http://ads.mdotm.com/ads/feed.php?key=%s&deviceid=%s&width=320&height=50&platform=iphone&fmt=json&appkey=%s&clientip=%s", adrolloRation.getNetworkKey(), uuid, aid, clientIP);
+			s_adrolloUrl = s_adrolloUrl.replaceAll("%", "|");
+ 
+			StringBuffer mdotmJson = new StringBuffer();
 
-	    long adrolloTime = adrolloEnd - adrolloStart;
+			log.debug("Adrollo request to: " + s_adrolloUrl);
+			long adrolloStart = System.currentTimeMillis();
 
-	    log.info("Adrollo proxy took " + adrolloTime + " ms");
+			BufferedReader adrolloReader = null;
+			try {
 
-	    if(!mdotmJson.toString().isEmpty() && !mdotmJson.toString().equals("[]")) {
-		JSONObject adrolloResponse;
-		try {
-		    JSONArray adrolloArray = new JSONArray(mdotmJson.toString());
-		    adrolloResponse = adrolloArray.getJSONObject(0);
+				URL adrolloUrl = new URL(s_adrolloUrl);
+				URLConnection adrolloUrlConnection = adrolloUrl.openConnection();
+				adrolloUrlConnection.setConnectTimeout(70);
+				adrolloUrlConnection.setReadTimeout(70);
+				adrolloReader = new BufferedReader(new InputStreamReader(adrolloUrlConnection.getInputStream()));
+				String inputLine;
+				while ((inputLine = adrolloReader.readLine()) != null) {
+					mdotmJson.append(inputLine);
+				}
+			}
+			catch(SocketTimeoutException e) {
+				log.info("Adrollo connect timed out.");
+			}
+			finally {
+				if(adrolloReader != null) {
+					adrolloReader.close();
+				}
+			}
 
-		    String img_url = adrolloResponse.getString("img_url");
-		    if(img_url == null || img_url.isEmpty()) {
-			img_url = "http://adrollo-images.s3.amazonaws.com/logo4.gif";
-		    }
+			long adrolloEnd = System.currentTimeMillis();
+
+			long adrolloTime = adrolloEnd - adrolloStart;
+
+			log.info("Adrollo proxy took " + adrolloTime + " ms");
+
+			if(!mdotmJson.toString().isEmpty() && !mdotmJson.toString().equals("[]")) {
+				JSONObject adrolloResponse;
+				try {
+					JSONArray adrolloArray = new JSONArray(mdotmJson.toString());
+					adrolloResponse = adrolloArray.getJSONObject(0);
+
+					String img_url = adrolloResponse.getString("img_url");
+					if(img_url == null || img_url.isEmpty()) {
+						img_url = "http://adrollo-images.s3.amazonaws.com/logo4.gif";
+					}
 
 
-		    String redirect_url = adrolloResponse.getString("landing_url");
-		    if(redirect_url == null || redirect_url.isEmpty()) {
-			redirect_url = "";
-		    }
+					String redirect_url = adrolloResponse.getString("landing_url");
+					if(redirect_url == null || redirect_url.isEmpty()) {
+						redirect_url = "";
+					}
 
-		    int ad_type = adrolloResponse.getInt("ad_type");
+					int ad_type = adrolloResponse.getInt("ad_type");
 
-		    String ad_text = adrolloResponse.getString("ad_text");
-		    if(ad_text == null || ad_text.isEmpty()) {
-			ad_text = "";
-		    }
+					String ad_text = adrolloResponse.getString("ad_text");
+					if(ad_text == null || ad_text.isEmpty()) {
+						ad_text = "";
+					}
 
-		    // Setting to anything else will break legacy clients
-		    int launchType = AdWhirlUtil.LAUNCH_TYPE.LAUNCH_TYPE_SAFARI.ordinal();
+					// Setting to anything else will break legacy clients
+					int launchType = AdWhirlUtil.LAUNCH_TYPE.LAUNCH_TYPE_SAFARI.ordinal();
 
-		    jsonAdrollo = new JSONStringer().object()
-			.key("img_url")
-			.value(img_url)
-			.key("redirect_url")
-			.value(redirect_url)
-			.key("ad_type")
-			.value(ad_type)
-			.key("ad_text")
-			.value(ad_text)
-			.key("launch_type")
-			.value(launchType)
-			.key("metrics_url")
-			.value("http://" + AdWhirlUtil.SERVER + "/exclick.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200")
-			.key("subtext")
-			.value("")
-			.key("webview_animation_type")
-			.value(1)
-			.endObject().toString();
+					jsonAdrollo = new JSONStringer().object()
+					.key("img_url")
+					.value(img_url)
+					.key("redirect_url")
+					.value(redirect_url)
+					.key("ad_type")
+					.value(ad_type)
+					.key("ad_text")
+					.value(ad_text)
+					.key("launch_type")
+					.value(launchType)
+					.key("metrics_url")
+					.value("http://" + AdWhirlUtil.SERVER + "/exclick.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200")
+					.key("subtext")
+					.value("")
+					.key("webview_animation_type")
+					.value(1)
+					.endObject().toString();
 
-		    String metricsRequest = "http://localhost/exmet.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200";
-		    new URL(metricsRequest).openStream().close();
+					String metricsRequest = "http://localhost/exmet.php?nid=" + adrolloRation.getNid() + "&appid=" + aid + "&type=12&appver=200";
+					new URL(metricsRequest).openStream().close();
 
-		    log.debug("Success on <" + s_adrolloUrl + ">");
-		} catch (JSONException e) {
-		    log.error("Unable to parse mdotm's JSON <" + s_adrolloUrl + ", " + mdotmJson + ">", e);
+					log.debug("Success on <" + s_adrolloUrl + ">");
+				} catch (JSONException e) {
+					log.error("Unable to parse mdotm's JSON <" + s_adrolloUrl + ", " + mdotmJson + ">", e);
+				}
+			}			
 		}
-	    }			
+
+		httpServletResponse.setCharacterEncoding("UTF-8");
+		httpServletResponse.setContentType("application/json");
+
+		PrintWriter out = httpServletResponse.getWriter();
+		if(jsonAdrollo == null) {
+			// TODO - Don't know what legacy clients want if we can't provide adrollo json
+			out.print("[]");
+		}
+		else {
+			out.print(jsonAdrollo);
+		}
+		out.close();	
 	}
 
-	httpServletResponse.setCharacterEncoding("UTF-8");
-	httpServletResponse.setContentType("application/json");
-
-	PrintWriter out = httpServletResponse.getWriter();
-	if(jsonAdrollo == null) {
-	    // TODO - Don't know what legacy clients want if we can't provide adrollo json
-	    out.print("[]");
-	}
-	else {
-	    out.print(jsonAdrollo);
-	}
-	out.close();	
-    }
 }
