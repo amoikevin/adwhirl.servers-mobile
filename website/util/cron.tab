@@ -1,0 +1,10 @@
+5 9 * * * cd /root/adwhirl-servers-internal/website/util/ && /usr/bin/php -q /root/adwhirl-servers-internal/website/util/cronDeleteUnverified.php  #delete old unverified users
+6 9 * * * cd /root/adwhirl-servers-internal/website/util/ && /bin/bash /root/adwhirl-servers-internal/website/util/cronDeleteImagesTemp.bash #delete old files in imagestemp
+@daily rm /var/log/httpd/access_*
+5 19 * * * cd /root/adwhirl-servers-internal/website/util/ && /usr/bin/php -q /root/adwhirl-servers-internal/website/util/dailyAllocations.php 1 #e-mail daily network allocations report
+5 19 * * * cd /root/adwhirl-servers-internal/website/util/ && /usr/bin/php -q /root/adwhirl-servers-internal/website/util/dailyAndroid.php 15 1 #e-mail daily traffic and app activity report
+5 19 * * * cd /root/adwhirl-servers-internal/website/util/ && /usr/bin/php -q /root/adwhirl-servers-internal/website/util/dailyTraffic.php 15 1 #e-mail daily traffic and app activity report
+5 19 * * * cd /root/adwhirl-servers-internal/website/util/ && /usr/bin/php -q /root/adwhirl-servers-internal/website/util/dailyAdMobKeys.php 1 #e-mail daily admob site ids
+5 19 * * * cd /root/adwhirl-servers-internal/website/util/ && /usr/bin/php -q /root/adwhirl-servers-internal/website/util/dailyLeaderboard.php 1 #e-mail daily stats by adwhirl sdk key
+@weekly /etc/init.d/httpd graceful
+
