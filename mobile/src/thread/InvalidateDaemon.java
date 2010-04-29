@@ -90,7 +90,7 @@ public class InvalidateDaemon implements Runnable {
 				}
 			}
 			catch(Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;
@@ -115,7 +115,7 @@ public class InvalidateDaemon implements Runnable {
 				}
 			}
 			catch(Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;
@@ -130,7 +130,7 @@ public class InvalidateDaemon implements Runnable {
 			try {
 				sdb.deleteAttributes(deleteRequest);
 			} catch (Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 				return;
 			}
 		}

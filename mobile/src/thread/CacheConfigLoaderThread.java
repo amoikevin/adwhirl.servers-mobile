@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import util.CacheUtil;
 
 public class CacheConfigLoaderThread implements Runnable {
-	static Logger log = Logger.getLogger("PreloadThread");
+	static Logger log = Logger.getLogger("CacheConfigLoaderThread");
 
 	private List<Item> appsList;
 	private int threadId;
@@ -36,7 +36,7 @@ public class CacheConfigLoaderThread implements Runnable {
 	}
 	
 	public void run() {
-	    log.debug("PreloadThread<"+ threadId + "> started");
+	    log.debug("CacheConfigLoaderThread<"+ threadId + "> started");
 					
 		for(Item item : appsList) {
 			String aid = item.getName();

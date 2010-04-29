@@ -42,9 +42,7 @@ import com.amazonaws.services.simpledb.util.SimpleDBUtils;
 import thread.CacheAppCustomsLoaderThread;
 import thread.CacheConfigLoaderThread;
 import thread.CacheCustomsLoaderThread;
-import thread.InvalidateConfigsThread;
-import thread.InvalidateCustomsThread;
-
+import thread.InvalidateThread;
 
 public class CacheUtil {
 	private static AmazonSimpleDB sdb;
@@ -60,11 +58,8 @@ public class CacheUtil {
 		preloadCustoms();
 		preloadConfigs();
 		
-		Thread invalidater = new Thread(new InvalidateConfigsThread());
+		Thread invalidater = new Thread(new InvalidateThread());
 	    invalidater.start();
-	    
-	    Thread customsInvalidater = new Thread(new InvalidateCustomsThread());
-	    customsInvalidater.start();
 	}
 
 	private static Cache getCache(String cacheName) {
@@ -121,7 +116,7 @@ public class CacheUtil {
 			    thread.start();
 			} 
 			catch (Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 	        } 
 	    }
 	    while(appsNextToken != null);
@@ -155,7 +150,7 @@ public class CacheUtil {
 			    thread.start();
 			}
 			catch(Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 		    }
 	    }
 	    while(customsNextToken != null);
@@ -189,7 +184,7 @@ public class CacheUtil {
 			    thread.start();
 			}
 			catch(Exception e) {
-			    AdWhirlUtil.logException(e);
+			    AdWhirlUtil.logException(e, log);
 		    }
 	    }
 	    while(appsNextToken != null);
@@ -344,7 +339,7 @@ public class CacheUtil {
 				loaded = true;
 			}
 			catch (Exception e) {
-			    AdWhirlUtil.logException(e);
+			    AdWhirlUtil.logException(e, log);
 			}       
 		}
 
@@ -922,7 +917,7 @@ public class CacheUtil {
 				loaded = true;
 			}
 			catch(Exception e) {
-			    AdWhirlUtil.logException(e);
+			    AdWhirlUtil.logException(e, log);
 			}	
 		}
 
@@ -1040,7 +1035,7 @@ public class CacheUtil {
 				loaded = true;
 			}
 			catch (Exception e) {
-			    AdWhirlUtil.logException(e);
+			    AdWhirlUtil.logException(e, log);
 			}	
 		}
 
@@ -1077,7 +1072,7 @@ public class CacheUtil {
 				loaded = true;
 			}
 			catch (Exception e) {
-			    AdWhirlUtil.logException(e);
+			    AdWhirlUtil.logException(e, log);
 			}	
 		}
 

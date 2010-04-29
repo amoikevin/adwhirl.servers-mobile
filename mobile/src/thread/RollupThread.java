@@ -119,7 +119,7 @@ public class RollupThread implements Runnable {
 			}
 			catch(Exception e) {
 				log.error("Unable to process legacy hit, aid=\"" + aid + "\" and type=\"" + type + "\", message: " + e.getMessage());
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 				continue;
 			}
 			
@@ -187,7 +187,7 @@ public class RollupThread implements Runnable {
 			sdb.putAttributes(request);
 		} catch (Exception e) {
 			log.error("Unable to create item \"" + item + "\": " + e.getMessage());
-			AdWhirlUtil.logException(e);
+			AdWhirlUtil.logException(e, log);
 		}
 	}
 }

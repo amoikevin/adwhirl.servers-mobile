@@ -69,7 +69,7 @@ public class RollupDaemon implements Runnable {
 					helper.start();
 				}
 				catch(Exception e) {
-					AdWhirlUtil.logException(e);
+					AdWhirlUtil.logException(e, log);
 
 					// Eventually we'll get a 'stale request' error and need to start over.
 					invalidsNextToken = null;
@@ -158,7 +158,7 @@ public class RollupDaemon implements Runnable {
 					}
 				}
 				catch(Exception e) {
-					AdWhirlUtil.logException(e);
+					AdWhirlUtil.logException(e, log);
 					return;
 				}
 			}
@@ -214,7 +214,7 @@ public class RollupDaemon implements Runnable {
 				putItem(AdWhirlUtil.DOMAIN_STATS, itemName, list);
 			}
 			catch(Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 				return false;
 			}
 
@@ -239,7 +239,7 @@ public class RollupDaemon implements Runnable {
 				try {
 					sdb.deleteAttributes(deleteRequest);
 				} catch (Exception e) {
-					AdWhirlUtil.logException(e);
+					AdWhirlUtil.logException(e, log);
 					return;
 				}
 			}
@@ -249,7 +249,7 @@ public class RollupDaemon implements Runnable {
 			try {
 				sdb.deleteAttributes(deleteRequest);
 			} catch (Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 				return;
 			}
 		}
@@ -261,7 +261,7 @@ public class RollupDaemon implements Runnable {
 			try {
 				sdb.putAttributes(request);
 			} catch (Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 				return;
 			}
 		}

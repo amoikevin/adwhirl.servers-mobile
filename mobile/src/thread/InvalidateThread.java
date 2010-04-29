@@ -28,12 +28,10 @@ import com.amazonaws.services.simpledb.model.SelectResult;
 import util.AdWhirlUtil;
 import util.CacheUtil;
 
-public class InvalidateCustomsThread implements Runnable {
+public class InvalidateThread implements Runnable {
 	static Logger log = Logger.getLogger("InvalidateCustomsThread");
 	
 	private static AmazonSimpleDB sdb;
-	
-	public InvalidateCustomsThread() {}
 	
 	public void run() {
 		log.info("InvalidateCustomsThread started");
@@ -41,7 +39,7 @@ public class InvalidateCustomsThread implements Runnable {
 		sdb = AdWhirlUtil.getSDB();
 		
 		while(true) {
-			invalidateNids();
+			invalidateCids();
 			invalidateAids();
 			
 			try {
@@ -52,7 +50,7 @@ public class InvalidateCustomsThread implements Runnable {
 		}
 	}
 
-	private void invalidateNids() {
+	private void invalidateCids() {
 		log.info("Invalidating customs");
 		
 		String invalidsNextToken = null;
@@ -71,7 +69,7 @@ public class InvalidateCustomsThread implements Runnable {
 				}
 			}
 			catch(Exception e) {
-				AdWhirlUtil.logException(e);
+				AdWhirlUtil.logException(e, log);
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;
@@ -81,7 +79,7 @@ public class InvalidateCustomsThread implements Runnable {
 	}
 	
 	private void invalidateAids() {
-		log.info("Invalidating aids for customs");
+		log.info("Invalidating aids");
 		
 		String invalidsNextToken = null;
 		do {
