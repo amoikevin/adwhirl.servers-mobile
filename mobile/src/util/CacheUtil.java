@@ -97,14 +97,14 @@ public class CacheUtil {
 	}
 	
 	private static void preloadConfigs() {
-		log.info("Preloading configs...");
+		log.warn("Preloading configs...");
 		
 		List<Thread> threads = new ArrayList<Thread>();
 
 		int threadId = 1;
 		String appsNextToken = null;
 	    do {
-			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`");
+			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "` where deleted is null");
 			appsRequest.setNextToken(appsNextToken);
 			try {
 			    SelectResult appsResult = sdb.select(appsRequest);
@@ -131,14 +131,14 @@ public class CacheUtil {
 	}
 
 	private static void preloadCustoms() {
-		log.info("Preloading customs...");
+		log.warn("Preloading customs...");
 		
 		List<Thread> threads = new ArrayList<Thread>();
 		
 		int threadId = 1;
 		String customsNextToken = null;
 	    do {
-			SelectRequest customsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "`");
+			SelectRequest customsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "` where deleted is null");
 			customsRequest.setNextToken(customsNextToken);
 			try {
 			    SelectResult customsResult = sdb.select(customsRequest);
@@ -165,14 +165,14 @@ public class CacheUtil {
 	}
 	
 	private static void preloadAppCustoms() {
-		log.info("Preloading app customs...");
+		log.warn("Preloading app customs...");
 		
 		List<Thread> threads = new ArrayList<Thread>();
 		
 		int threadId = 1;
 		String appsNextToken = null;
 	    do {
-			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`");
+			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "` where deleted is null");
 			appsRequest.setNextToken(appsNextToken);
 			try {
 			    SelectResult appsResult = sdb.select(appsRequest);
@@ -252,7 +252,7 @@ public class CacheUtil {
 								extra.setTransition(transition);
 							}
 							else {
-								log.info("SELECT request pulled an unknown attribute <aid: " + aid + " + >: " + attributeName + "|" + attribute.getValue());
+								log.warn("SELECT request pulled an unknown attribute <aid: " + aid + " + >: " + attributeName + "|" + attribute.getValue());
 							}
 						}
 						catch(NumberFormatException e) {
@@ -261,7 +261,7 @@ public class CacheUtil {
 					}
 
 					//Now we pull the information about the app's nids
-					SelectRequest networksRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "'");
+					SelectRequest networksRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and deleted is null");
 					SelectResult networksResult = sdb.select(networksRequest);
 					List<Item> networksList = networksResult.getItems();
 
@@ -289,9 +289,15 @@ public class CacheUtil {
 									}
 									else if(networkAttributeName.equals("weight")) {
 										ration.setWeight(SimpleDBUtils.decodeZeroPaddingInt(networkAttribute.getValue()));
+										if(ration.getWeight() < 0) {
+										    log.warn("Ration weight should not be less than zero <nid:" + nid + ", weight:" + ration.getWeight() + ">");
+										}
 									}								
 									else if(networkAttributeName.equals("priority")) {
 										ration.setPriority(SimpleDBUtils.decodeZeroPaddingInt(networkAttribute.getValue()));
+										if(ration.getPriority() <= 0) {
+										    log.warn("Ration priority should not be less than one <nid:" + nid + ", priority:" + ration.getPriority() + ">");
+										}
 									}								
 									else if(networkAttributeName.equals("key")) {
 										ration.setNetworkKey(networkAttribute.getValue());
@@ -303,7 +309,7 @@ public class CacheUtil {
 										// Just means it's been edited by SDBExplorer, ignore.
 									}
 									else {
-										log.info("SELECT request pulled an unknown attribute <nid: " + nid + ">:" + networkAttributeName + "|" + networkAttribute.getValue());
+										log.warn("SELECT request pulled an unknown attribute <nid: " + nid + ">:" + networkAttributeName + "|" + networkAttribute.getValue());
 									}
 								}
 								catch(NumberFormatException e) {
@@ -347,10 +353,10 @@ public class CacheUtil {
 			genJsonConfigs(getCacheConfigs(), aid, extra, rations);
 		} 
 		catch (JSONException e) {
-			log.error("Error creating jsonConfig for aid <"+ aid +">: " + e.getMessage());
-			for(Ration ration : rations) {
-				log.info(ration.toString());
-			}
+		    log.error("Error creating jsonConfig for aid <"+ aid +">: " + e.getMessage(), e);
+		    for(Ration ration : rations) {
+			log.warn(ration.toString());
+		    }
 		}
 	}
 
@@ -905,7 +911,7 @@ public class CacheUtil {
 								// Just means it's been edited by SDBExplorer, ignore.
 							}
 							else {
-								log.info("SELECT request pulled an unknown attribute <cid: " + nid + ">: " + attributeName + "|" + attribute.getValue());
+								log.warn("SELECT request pulled an unknown attribute <cid: " + nid + ">: " + attributeName + "|" + attribute.getValue());
 							}
 						}
 						catch(NumberFormatException e) {

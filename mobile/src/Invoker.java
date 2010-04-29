@@ -56,12 +56,14 @@ public class Invoker {
 		CacheUtil.initalize();
 		CacheUtil.preload();
 
-		Server server = new Server(8080);
-		
-		QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setMinThreads(10);
-		threadPool.setMaxThreads(100);
-		server.setThreadPool(threadPool);
+		Server server = new Server(80);
+
+		/*
+		  QueuedThreadPool threadPool = new QueuedThreadPool();
+		  threadPool.setMinThreads(10);
+		  threadPool.setMaxThreads(100);
+		  server.setThreadPool(threadPool);
+		*/
 		
 		try {
 			HandlerCollection handlers = new HandlerCollection();
