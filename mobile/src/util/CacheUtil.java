@@ -196,9 +196,6 @@ public class CacheUtil {
 	    }
 	}
 
-	
-	
-	/****************************************************************************/
 	public void loadApp(Cache cache, String aid) {
 		log.debug("Loading app <" + aid + "> into the cache");
 		
@@ -347,7 +344,8 @@ public class CacheUtil {
 
 								if(cachedAppCustom != null) {
 									int weight = ration.getWeight();
-								
+
+									@SuppressWarnings("unchecked")
 									List<Ration> customRations = (List<Ration>)cachedAppCustom.getObjectValue();
 									for(Ration customRation : customRations) {
 										customRation.setPriority(ration.getPriority());
