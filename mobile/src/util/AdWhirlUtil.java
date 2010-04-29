@@ -21,6 +21,7 @@ import com.amazonaws.sdb.AmazonSimpleDBConfig;
 public class AdWhirlUtil {
     public static final String SERVER = "AdWhirlLB-473732162.us-east-1.elb.amazonaws.com";
 
+    public static final String DOMAIN_APP_CUSTOMS = "app_customs";
     public static final String DOMAIN_APPS = "apps";
     public static final String DOMAIN_APPS_INVALID = "apps_invalid";
     public static final String DOMAIN_NETWORKS = "networks";

@@ -26,12 +26,18 @@ public class Ration {
 	private String networkKey = "";
 	private int priority = 0;
 	
+	public Ration() {}
+	
 	public Ration(String nid) {
 		this.nid = nid;
 	}
 	
 	public String getNid() {
 		return this.nid;
+	}
+	
+	public void setNid(String nid) {
+		this.nid = nid;
 	}
 	
 	public int getType() {

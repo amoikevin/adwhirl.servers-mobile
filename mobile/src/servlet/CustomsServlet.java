@@ -16,18 +16,9 @@ limitations under the License.
 
 package servlet;
 
-import com.amazonaws.sdb.AmazonSimpleDB;
-import com.amazonaws.sdb.AmazonSimpleDBClient;
-import com.amazonaws.sdb.AmazonSimpleDBException;
-import com.amazonaws.sdb.model.Item;
-import com.amazonaws.sdb.model.SelectRequest;
-import com.amazonaws.sdb.model.SelectResponse;
-import com.amazonaws.sdb.model.SelectResult;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -38,16 +29,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import obj.Ration;
 
 import org.apache.log4j.Logger;
 
-import thread.CacheAppCustomsLoaderThread;
-import thread.CacheCustomsLoaderThread;
-import thread.InvalidateCustomsThread;
-import util.AdWhirlUtil;
+import util.CacheUtil;
 
 public class CustomsServlet extends HttpServlet 
 {	
@@ -58,99 +45,10 @@ public class CustomsServlet extends HttpServlet
 	//We only want one instance of the cache and db client per instance
 	private static Cache customsCache;
 	private static Cache appCustomsCache;
-	private static AmazonSimpleDB sdb;
 
 	public void init(ServletConfig servletConfig) throws ServletException {
-		CacheManager.create();
-
-		String customsCacheName = "json_customs";
-		customsCache = CacheManager.getInstance().getCache(customsCacheName);
-		if(customsCache == null) {
-			log.fatal("Unable to initialize cache \"" + customsCacheName + "\"");
-			System.exit(0);
-		}
-
-		String appCustomsCacheName = "appCustoms";
-		appCustomsCache = CacheManager.getInstance().getCache(appCustomsCacheName);
-		if(appCustomsCache == null) {
-			log.fatal("Unable to initialize cache \"" + appCustomsCacheName + "\"");
-			System.exit(0);
-		}
-		
-		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
-
-		preloadAppCustoms();
-		preloadCustoms();
-		
-
-	    Thread customsInvalidater = new Thread(new InvalidateCustomsThread(customsCache, appCustomsCache));
-	    customsInvalidater.start();
-		
-		log.info("Servlet initialized completed");
-	}
-
-	private void preloadCustoms() {
-		List<Thread> threads = new ArrayList<Thread>();
-		
-		int threadId = 1;
-		String customsNextToken = null;
-	    do {
-			SelectRequest customsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "`", customsNextToken);
-			try {
-			    SelectResponse customsResponse = sdb.select(customsRequest);
-			    SelectResult customsResult = customsResponse.getSelectResult();
-			    customsNextToken = customsResult.getNextToken();
-			    List<Item> customsList = customsResult.getItem();
-				 
-			    Thread thread = new Thread(new CacheCustomsLoaderThread(customsCache, customsList, threadId++));
-			    threads.add(thread);
-			    thread.start();
-			}
-			catch(AmazonSimpleDBException e) {
-			    log.warn("Error querying SimpleDB: " + e.getMessage());
-		    }
-	    }
-	    while(customsNextToken != null);
-	    
-	    for(Thread thread : threads) {
-	    	try {
-				thread.join();
-			} catch (InterruptedException e) {
-				log.error("Caught exception while joining preload threads", e);
-			}
-	    }
-	}
-	
-	private void preloadAppCustoms() {
-		List<Thread> threads = new ArrayList<Thread>();
-		
-		int threadId = 1;
-		String appsNextToken = null;
-	    do {
-			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`", appsNextToken);
-			try {
-			    SelectResponse appsResponse = sdb.select(appsRequest);
-			    SelectResult appsResult = appsResponse.getSelectResult();
-			    appsNextToken = appsResult.getNextToken();
-			    List<Item> appsList = appsResult.getItem();
-				    
-			    Thread thread = new Thread(new CacheAppCustomsLoaderThread(appCustomsCache, appsList, threadId++));
-			    threads.add(thread);
-			    thread.start();
-			}
-			catch(AmazonSimpleDBException e) {
-			    log.warn("Error querying SimpleDB: " + e.getMessage());
-		    }
-	    }
-	    while(appsNextToken != null);
-	    
-	    for(Thread thread : threads) {
-	    	try {
-				thread.join();
-			} catch (InterruptedException e) {
-				log.error("Caught exception while joining preload threads", e);
-			}
-	    }
+		customsCache = CacheUtil.getCacheCustoms();
+		appCustomsCache = CacheUtil.getCacheAppCustoms();
 	}
 
 	protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {

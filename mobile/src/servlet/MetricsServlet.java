@@ -28,10 +28,10 @@ import org.apache.log4j.Logger;
 
 import thread.RollupThread;
 import util.AdWhirlUtil;
+import util.CacheUtil;
 import obj.HitObject;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 public class MetricsServlet extends HttpServlet 
@@ -45,19 +45,8 @@ public class MetricsServlet extends HttpServlet
     public static Thread rollupThread;
 	
     public void init(ServletConfig servletConfig) throws ServletException {
-	CacheManager.create();
-		
-	hitsCache = CacheManager.getInstance().getCache("hitsCache");
-	if(hitsCache == null) {
-	    log.fatal("Unable to initialize cache \"hitsCache\"");
-	    System.exit(0);
-	}		
-		
-	legacyHitsCache = CacheManager.getInstance().getCache("legacyHitsCache");
-	if(legacyHitsCache == null) {
-	    log.fatal("Unable to initialize cache \"legacyHitsCache\"");
-	    System.exit(0);
-	}
+	hitsCache = CacheUtil.getCacheHits();
+	legacyHitsCache = CacheUtil.getCacheHitsLegacy();
 
 	rollupThread = new Thread(new RollupThread());
 	rollupThread.start();	

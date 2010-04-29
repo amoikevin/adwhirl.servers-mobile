@@ -35,9 +35,9 @@ public class CacheConfigLoaderThread implements Runnable {
 	private List<Item> appsList;
 	private int threadId;
 	
-    public CacheConfigLoaderThread(Cache cache, Cache adrolloCache, List<Item> appsList, int threadId) {
-		this.cache = cache;
-		this.adrolloCache = adrolloCache;
+    public CacheConfigLoaderThread(List<Item> appsList, int threadId) {
+		this.cache = CacheUtil.getCacheConfigs();
+		this.adrolloCache = CacheUtil.getCacheAdrollo();
 	    this.appsList = appsList;
 	    this.threadId = threadId;
 	}

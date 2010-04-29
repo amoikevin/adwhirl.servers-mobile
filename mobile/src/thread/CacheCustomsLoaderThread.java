@@ -34,8 +34,8 @@ public class CacheCustomsLoaderThread implements Runnable {
 	private List<Item> customsList;
 	private int threadId;
 	
-	public CacheCustomsLoaderThread(Cache cache, List<Item> customsList, int threadId) {
-		this.cache = cache;
+	public CacheCustomsLoaderThread(List<Item> customsList, int threadId) {
+		this.cache = CacheUtil.getCacheCustoms();
 	    this.customsList = customsList;
 	    this.threadId = threadId;
 	}

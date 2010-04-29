@@ -34,8 +34,8 @@ public class CacheAppCustomsLoaderThread implements Runnable {
 	private List<Item> appsList;
 	private int threadId;
 	
-	public CacheAppCustomsLoaderThread(Cache cache, List<Item> appsList, int threadId) {
-		this.cache = cache;
+	public CacheAppCustomsLoaderThread(List<Item> appsList, int threadId) {
+		this.cache = CacheUtil.getCacheAppCustoms();
 	    this.appsList = appsList;
 	    this.threadId = threadId;
 	}
