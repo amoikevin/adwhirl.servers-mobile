@@ -16,16 +16,6 @@ limitations under the License.
 
 package thread;
 
-import com.amazonaws.sdb.AmazonSimpleDB;
-import com.amazonaws.sdb.AmazonSimpleDBClient;
-import com.amazonaws.sdb.AmazonSimpleDBException;
-import com.amazonaws.sdb.model.Item;
-import com.amazonaws.sdb.model.PutAttributesRequest;
-import com.amazonaws.sdb.model.ReplaceableAttribute;
-import com.amazonaws.sdb.model.SelectRequest;
-import com.amazonaws.sdb.model.SelectResponse;
-import com.amazonaws.sdb.model.SelectResult;
-
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -35,6 +25,13 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.model.Item;
+import com.amazonaws.services.simpledb.model.PutAttributesRequest;
+import com.amazonaws.services.simpledb.model.ReplaceableAttribute;
+import com.amazonaws.services.simpledb.model.SelectRequest;
+import com.amazonaws.services.simpledb.model.SelectResult;
 
 import net.sf.ehcache.Element;
 
@@ -52,7 +49,7 @@ public class RollupThread implements Runnable {
 	public void run() {
 		log.info("RollupThread started");
 		
-		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
+		sdb = AdWhirlUtil.getSDB();
 		
 		while(true) {
 			processHitsCache();
@@ -104,18 +101,18 @@ public class RollupThread implements Runnable {
 			}
 			
 			String nid = null;
-			SelectRequest request = new SelectRequest("select itemName() from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + type + "' limit 1", null);
+			SelectRequest request = new SelectRequest("select itemName() from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + type + "' limit 1");
 			try {
-				SelectResponse response = sdb.select(request);
-				SelectResult result = response.getSelectResult();
-				List<Item> list = result.getItem();
+				SelectResult result = sdb.select(request);
+				List<Item> list = result.getItems();
 
 				for(Item item : list) {		
 					nid = item.getName();
 				}
 			}
-			catch(AmazonSimpleDBException e) {
+			catch(Exception e) {
 				log.error("Unable to process legacy hit, aid=\"" + aid + "\" and type=\"" + type + "\", message: " + e.getMessage());
+				AdWhirlUtil.logException(e);
 				continue;
 			}
 			
@@ -160,27 +157,30 @@ public class RollupThread implements Runnable {
 		ho.clicks.addAndGet(-1 * i_clicks);
 		
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
-		list.add(new ReplaceableAttribute("nid", nid, false));
-		list.add(new ReplaceableAttribute("type", type, false));
-		list.add(new ReplaceableAttribute("impressions", impressions, false));
-		list.add(new ReplaceableAttribute("clicks", clicks, false));
-		list.add(new ReplaceableAttribute("dateTime", dateTime, false));
+
+		list.add(new ReplaceableAttribute().withName("nid").withValue(nid).withReplace(true));
+		list.add(new ReplaceableAttribute().withName("type").withValue(type).withReplace(true));
+		list.add(new ReplaceableAttribute().withName("impressions").withValue(impressions).withReplace(true));
+		list.add(new ReplaceableAttribute().withName("clicks").withValue(clicks).withReplace(true));
+		list.add(new ReplaceableAttribute().withName("dateTime").withValue(dateTime).withReplace(true));
+		
 		putItem(AdWhirlUtil.DOMAIN_STATS_TEMP, UUID.randomUUID().toString().replace("-", ""), list);
 		
 		List<ReplaceableAttribute> list2 = new ArrayList<ReplaceableAttribute>();
-		list2.add(new ReplaceableAttribute("aid", ho.aid, false));
-		list2.add(new ReplaceableAttribute("dateTime", dateTimeDetail, true));
+		list2.add(new ReplaceableAttribute().withName("aid").withValue(ho.aid).withReplace(false));
+		list2.add(new ReplaceableAttribute().withName("dateTime").withValue(dateTimeDetail).withReplace(true));
 		putItem(AdWhirlUtil.DOMAIN_STATS_INVALID, nid, list2);
 	}
 
 	private void putItem(String domain, String item, List<ReplaceableAttribute> list) {
 		log.debug("Putting Amazon SimpleDB item: " + item);
 		PutAttributesRequest request = new PutAttributesRequest().withDomainName(domain).withItemName(item);
-		request.setAttribute(list);
+		request.setAttributes(list);
 		try {
 			sdb.putAttributes(request);
-		} catch (AmazonSimpleDBException e) {
+		} catch (Exception e) {
 			log.error("Unable to create item \"" + item + "\": " + e.getMessage());
+			AdWhirlUtil.logException(e);
 		}
 	}
 }

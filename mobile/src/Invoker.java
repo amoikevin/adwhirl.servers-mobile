@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.amazonaws.sdb.AmazonSimpleDBClient;
-import com.amazonaws.sdb.AmazonSimpleDBException;
-import com.amazonaws.sdb.model.CreateDomainRequest;
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.model.CreateDomainRequest;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Handler;
@@ -40,11 +39,11 @@ import util.CacheUtil;
 public class Invoker {
 	static Logger log = Logger.getLogger("Invoker");
 	
-	private static AmazonSimpleDBClient sdb;
+	private static AmazonSimpleDB sdb;
 	
 	public static void main(String[] args) {
-		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
-		 
+        sdb = AdWhirlUtil.getSDB();
+        
 		/*
 		try {
 			setupSimpleDB();
@@ -96,7 +95,7 @@ public class Invoker {
 	}
 
 	@SuppressWarnings("unused")
-	private static void setupSimpleDB() throws AmazonSimpleDBException {
+	private static void setupSimpleDB() {
 		createDomain(AdWhirlUtil.DOMAIN_APP_CUSTOMS);
 		createDomain(AdWhirlUtil.DOMAIN_APPS);
 		createDomain(AdWhirlUtil.DOMAIN_APPS_INVALID);
@@ -111,7 +110,7 @@ public class Invoker {
 		createDomain(AdWhirlUtil.DOMAIN_USERS_UNVERIFIED);
 	}
 	
-	private static void createDomain(String domain) throws AmazonSimpleDBException {
+	private static void createDomain(String domain) {
 		log.info("Creating Amazon SimpleDB domain: " + domain);
 		CreateDomainRequest request = new CreateDomainRequest(domain);
 		sdb.createDomain(request);

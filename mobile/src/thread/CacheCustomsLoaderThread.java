@@ -18,7 +18,7 @@ package thread;
 
 import java.util.List;
 
-import com.amazonaws.sdb.model.Item;
+import com.amazonaws.services.simpledb.model.Item;
 
 import org.apache.log4j.Logger;
 

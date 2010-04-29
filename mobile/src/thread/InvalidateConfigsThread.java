@@ -16,17 +16,14 @@ limitations under the License.
 
 package thread;
 
-import com.amazonaws.sdb.AmazonSimpleDB;
-import com.amazonaws.sdb.AmazonSimpleDBClient;
-import com.amazonaws.sdb.AmazonSimpleDBException;
-import com.amazonaws.sdb.model.Item;
-import com.amazonaws.sdb.model.SelectRequest;
-import com.amazonaws.sdb.model.SelectResponse;
-import com.amazonaws.sdb.model.SelectResult;
-
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.model.Item;
+import com.amazonaws.services.simpledb.model.SelectRequest;
+import com.amazonaws.services.simpledb.model.SelectResult;
 
 import util.AdWhirlUtil;
 import util.CacheUtil;
@@ -41,7 +38,7 @@ public class InvalidateConfigsThread implements Runnable {
 	public void run() {
 		log.info("InvalidateConfigsThread started");
 		
-		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);
+		sdb = AdWhirlUtil.getSDB();
 		
 		while(true) {
 			invalidateAids();
@@ -59,12 +56,12 @@ public class InvalidateConfigsThread implements Runnable {
 		
 		String invalidsNextToken = null;
 		do {
-			SelectRequest invalidsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS_INVALID + "`", invalidsNextToken);
+			SelectRequest invalidsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS_INVALID + "`");
+			invalidsRequest.setNextToken(invalidsNextToken);
 			try {
-			    SelectResponse invalidsResponse = sdb.select(invalidsRequest);
-			    SelectResult invalidsResult = invalidsResponse.getSelectResult();
+			    SelectResult invalidsResult = sdb.select(invalidsRequest);
 			    invalidsNextToken = invalidsResult.getNextToken();
-			    List<Item> invalidsList = invalidsResult.getItem();
+			    List<Item> invalidsList = invalidsResult.getItems();
 				    
 				for(Item item : invalidsList) {
 				    String aid = item.getName();
@@ -78,8 +75,8 @@ public class InvalidateConfigsThread implements Runnable {
 				    }
 				}
 			}
-			catch(AmazonSimpleDBException e) {
-				log.warn("Error querying SimpleDB: " + e.getMessage());
+			catch(Exception e) {
+				AdWhirlUtil.logException(e);
 
 				// Eventually we'll get a 'stale request' error and need to start over.
 				invalidsNextToken = null;

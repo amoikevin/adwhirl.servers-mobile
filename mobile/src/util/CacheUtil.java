@@ -32,28 +32,26 @@ import org.json.JSONException;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 
+import com.amazonaws.services.simpledb.AmazonSimpleDB;
+import com.amazonaws.services.simpledb.model.Attribute;
+import com.amazonaws.services.simpledb.model.Item;
+import com.amazonaws.services.simpledb.model.SelectRequest;
+import com.amazonaws.services.simpledb.model.SelectResult;
+import com.amazonaws.services.simpledb.util.SimpleDBUtils;
+
 import thread.CacheAppCustomsLoaderThread;
 import thread.CacheConfigLoaderThread;
 import thread.CacheCustomsLoaderThread;
 import thread.InvalidateConfigsThread;
 import thread.InvalidateCustomsThread;
 
-import com.amazonaws.sdb.AmazonSimpleDB;
-import com.amazonaws.sdb.AmazonSimpleDBClient;
-import com.amazonaws.sdb.AmazonSimpleDBException;
-import com.amazonaws.sdb.model.Attribute;
-import com.amazonaws.sdb.model.Item;
-import com.amazonaws.sdb.model.SelectRequest;
-import com.amazonaws.sdb.model.SelectResponse;
-import com.amazonaws.sdb.model.SelectResult;
-import com.amazonaws.sdb.util.AmazonSimpleDBUtil;
 
 public class CacheUtil {
 	private static AmazonSimpleDB sdb;
     static Logger log = Logger.getLogger("CacheUtil");
 
 	public static void initalize() {
-		sdb = new AmazonSimpleDBClient(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey, AdWhirlUtil.config);	
+		sdb = AdWhirlUtil.getSDB();	
 	}
 	
 	public static void preload() {
@@ -111,20 +109,20 @@ public class CacheUtil {
 		int threadId = 1;
 		String appsNextToken = null;
 	    do {
-			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`", appsNextToken);
+			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`");
+			appsRequest.setNextToken(appsNextToken);
 			try {
-			    SelectResponse appsResponse = sdb.select(appsRequest);
-			    SelectResult appsResult = appsResponse.getSelectResult();
+			    SelectResult appsResult = sdb.select(appsRequest);
 			    appsNextToken = appsResult.getNextToken();
-			    List<Item> appsList = appsResult.getItem();
+			    List<Item> appsList = appsResult.getItems();
 				
 			    Thread thread = new Thread(new CacheConfigLoaderThread(appsList, threadId++));
 			    threads.add(thread);
 			    thread.start();
-			}
-			catch(AmazonSimpleDBException e) {
-			    log.warn("Error querying SimpleDB: " + e.getMessage());
-		    }
+			} 
+			catch (Exception e) {
+				AdWhirlUtil.logException(e);
+	        } 
 	    }
 	    while(appsNextToken != null);
 	    
@@ -145,19 +143,19 @@ public class CacheUtil {
 		int threadId = 1;
 		String customsNextToken = null;
 	    do {
-			SelectRequest customsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "`", customsNextToken);
+			SelectRequest customsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "`");
+			customsRequest.setNextToken(customsNextToken);
 			try {
-			    SelectResponse customsResponse = sdb.select(customsRequest);
-			    SelectResult customsResult = customsResponse.getSelectResult();
+			    SelectResult customsResult = sdb.select(customsRequest);
 			    customsNextToken = customsResult.getNextToken();
-			    List<Item> customsList = customsResult.getItem();
+			    List<Item> customsList = customsResult.getItems();
 				 
 			    Thread thread = new Thread(new CacheCustomsLoaderThread(customsList, threadId++));
 			    threads.add(thread);
 			    thread.start();
 			}
-			catch(AmazonSimpleDBException e) {
-			    log.warn("Error querying SimpleDB: " + e.getMessage());
+			catch(Exception e) {
+				AdWhirlUtil.logException(e);
 		    }
 	    }
 	    while(customsNextToken != null);
@@ -179,19 +177,19 @@ public class CacheUtil {
 		int threadId = 1;
 		String appsNextToken = null;
 	    do {
-			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`", appsNextToken);
+			SelectRequest appsRequest = new SelectRequest("select `itemName()` from `" + AdWhirlUtil.DOMAIN_APPS + "`");
+			appsRequest.setNextToken(appsNextToken);
 			try {
-			    SelectResponse appsResponse = sdb.select(appsRequest);
-			    SelectResult appsResult = appsResponse.getSelectResult();
+			    SelectResult appsResult = sdb.select(appsRequest);
 			    appsNextToken = appsResult.getNextToken();
-			    List<Item> appsList = appsResult.getItem();
+			    List<Item> appsList = appsResult.getItems();
 				    
 			    Thread thread = new Thread(new CacheAppCustomsLoaderThread(appsList, threadId++));
 			    threads.add(thread);
 			    thread.start();
 			}
-			catch(AmazonSimpleDBException e) {
-			    log.warn("Error querying SimpleDB: " + e.getMessage());
+			catch(Exception e) {
+			    AdWhirlUtil.logException(e);
 		    }
 	    }
 	    while(appsNextToken != null);
@@ -218,11 +216,10 @@ public class CacheUtil {
 			extra = new Extra();
 
 			//First we pull the general configuration information
-			SelectRequest request = new SelectRequest("select `adsOn`, `locationOn`, `fgColor`, `bgColor`, `cycleTime`, `transition` from `" + AdWhirlUtil.DOMAIN_APPS + "` where itemName() = '" + aid + "' limit 1", null);
+			SelectRequest request = new SelectRequest("select `adsOn`, `locationOn`, `fgColor`, `bgColor`, `cycleTime`, `transition` from `" + AdWhirlUtil.DOMAIN_APPS + "` where itemName() = '" + aid + "' limit 1");
 			try {
-				SelectResponse response = sdb.select(request);
-				SelectResult result = response.getSelectResult();
-				List<Item> itemList = result.getItem();
+				SelectResult result = sdb.select(request);;
+				List<Item> itemList = result.getItems();
 
 				for(Item item : itemList) {
 					int locationOn = 0;
@@ -231,49 +228,33 @@ public class CacheUtil {
 					int cycleTime = 30000;
 					int transition = 0;
 
-					List<Attribute> attributeList = item.getAttribute();
+					List<Attribute> attributeList = item.getAttributes();
 					for(Attribute attribute : attributeList) {
-						if(!attribute.isSetName()) {
-							continue;						
-						}
-
 						try {
 							String attributeName = attribute.getName();
 							if(attributeName.equals("adsOn")) {
-								if(attribute.isSetValue()) {
-									int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-									extra.setAdsOn(adsOn);
-								}
+								int adsOn = SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
+								extra.setAdsOn(adsOn);
 							}
 							else if(attributeName.equals("locationOn")) {
-								if(attribute.isSetValue()) {
-									locationOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-									extra.setLocationOn(locationOn);
-								}
+								locationOn = SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
+								extra.setLocationOn(locationOn);
 							}
 							else if(attributeName.equals("fgColor")) {
-								if(attribute.isSetValue()) {
-									fgColor = attribute.getValue();
-									extra.setFgColor(fgColor);
-								}
+								fgColor = attribute.getValue();
+								extra.setFgColor(fgColor);
 							}
 							else if(attributeName.equals("bgColor")) {
-								if(attribute.isSetValue()) {
-									bgColor = attribute.getValue();
-									extra.setBgColor(bgColor);
-								}
+								bgColor = attribute.getValue();
+								extra.setBgColor(bgColor);
 							}
 							else if(attributeName.equals("cycleTime")) {
-								if(attribute.isSetValue()) {
-									cycleTime = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-									extra.setCycleTime(cycleTime);
-								}
+								cycleTime = SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
+								extra.setCycleTime(cycleTime);
 							}
 							else if(attributeName.equals("transition")) {
-								if(attribute.isSetValue()) {
-									transition = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-									extra.setTransition(transition);
-								}
+								transition = SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
+								extra.setTransition(transition);
 							}
 							else {
 								log.info("SELECT request pulled an unknown attribute <aid: " + aid + " + >: " + attributeName + "|" + attribute.getValue());
@@ -285,10 +266,9 @@ public class CacheUtil {
 					}
 
 					//Now we pull the information about the app's nids
-					SelectRequest networksRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "'", null);
-					SelectResponse networksResponse = sdb.select(networksRequest);
-					SelectResult networksResult = networksResponse.getSelectResult();
-					List<Item> networksList = networksResult.getItem();
+					SelectRequest networksRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "'");
+					SelectResult networksResult = sdb.select(networksRequest);
+					List<Item> networksList = networksResult.getItems();
 
 					rations = new ArrayList<Ration>();
 
@@ -298,42 +278,28 @@ public class CacheUtil {
 
 							Ration ration = new Ration(nid);
 
-							List<Attribute> networkAttributeList = network.getAttribute();
+							List<Attribute> networkAttributeList = network.getAttributes();
 							for(Attribute networkAttribute : networkAttributeList) {
-								if(!networkAttribute.isSetName()) {
-									continue;						
-								}
-
 								try {
 									String networkAttributeName = networkAttribute.getName();
 									if(networkAttributeName.equals("adsOn")) {
-										if(networkAttribute.isSetValue()) {
-											int adsOn = AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue());
-											if(adsOn == 0) {
-												//We don't care about reporting back a network that isn't active
-												continue networks_loop;
-											}
+										int adsOn = SimpleDBUtils.decodeZeroPaddingInt(networkAttribute.getValue());
+										if(adsOn == 0) {
+											//We don't care about reporting back a network that isn't active
+											continue networks_loop;
 										}
 									}
 									else if(networkAttributeName.equals("type")) {
-										if(networkAttribute.isSetValue()) {
-											ration.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
-										}
+										ration.setType(SimpleDBUtils.decodeZeroPaddingInt(networkAttribute.getValue()));
 									}
 									else if(networkAttributeName.equals("weight")) {
-										if(networkAttribute.isSetValue()) {
-											ration.setWeight(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
-										}
+										ration.setWeight(SimpleDBUtils.decodeZeroPaddingInt(networkAttribute.getValue()));
 									}								
 									else if(networkAttributeName.equals("priority")) {
-										if(networkAttribute.isSetValue()) {
-											ration.setPriority(AmazonSimpleDBUtil.decodeZeroPaddingInt(networkAttribute.getValue()));
-										}
+										ration.setPriority(SimpleDBUtils.decodeZeroPaddingInt(networkAttribute.getValue()));
 									}								
 									else if(networkAttributeName.equals("key")) {
-										if(networkAttribute.isSetValue()) {
-											ration.setNetworkKey(networkAttribute.getValue());
-										}
+										ration.setNetworkKey(networkAttribute.getValue());
 									}
 									else if(networkAttributeName.equals("aid")) {
 										// We already know the aid.
@@ -377,8 +343,8 @@ public class CacheUtil {
 
 				loaded = true;
 			}
-			catch (AmazonSimpleDBException e) {
-				log.warn("Error querying SimpleDB: " + e.getMessage());
+			catch (Exception e) {
+			    AdWhirlUtil.logException(e);
 			}       
 		}
 
@@ -898,62 +864,41 @@ public class CacheUtil {
 		boolean loaded = false;
 		while(!loaded) {
 			//Custom (house) ad select query
-			SelectRequest customRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "` where itemName() = '" + nid + "' limit 1", null);
+			SelectRequest customRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_CUSTOMS + "` where itemName() = '" + nid + "' limit 1");
 			try {
-				SelectResponse customResponse = sdb.select(customRequest);
-				SelectResult customResult = customResponse.getSelectResult();
-				List<Item> customList = customResult.getItem();
+				SelectResult customResult = sdb.select(customRequest);
+				List<Item> customList = customResult.getItems();
 
 				for(Item cusItem : customList) {	
 					customAd = new CustomAd(cusItem.getName());
 
-					List<Attribute> cusAttributeList = cusItem.getAttribute();
+					List<Attribute> cusAttributeList = cusItem.getAttributes();
 					for(Attribute attribute : cusAttributeList) {
-						if(!attribute.isSetName()) {
-							continue;						
-						}
-
 						try {
 							String attributeName = attribute.getName();		
 							if(attributeName.equals("type")) {
-								if(attribute.isSetValue()) {
-									customAd.setType(AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue()));
-								}
+								customAd.setType(SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue()));
 							}
 							else if(attributeName.equals("aid")) {
-								if(attribute.isSetValue()) {
-									customAd.setAid(attribute.getValue());
-								}
+								customAd.setAid(attribute.getValue());
 							}
 							else if(attributeName.equals("imageLink")) {
-								if(attribute.isSetValue()) {
-									customAd.setImageLink(attribute.getValue());
-								}
+								customAd.setImageLink(attribute.getValue());
 							}					
 							else if(attributeName.equals("link")) {
-								if(attribute.isSetValue()) {
-									customAd.setLink(attribute.getValue());
-								}
+								customAd.setLink(attribute.getValue());
 							}				
 							else if(attributeName.equals("description")) {
-								if(attribute.isSetValue()) {
-									customAd.setDescription(attribute.getValue());
-								}
+								customAd.setDescription(attribute.getValue());
 							}					
 							else if(attributeName.equals("name")) {
-								if(attribute.isSetValue()) {
-									customAd.setName(attribute.getValue());
-								}
+								customAd.setName(attribute.getValue());
 							}
 							else if(attributeName.equals("linkType")) {
-								if(attribute.isSetValue()) {
-									customAd.setLinkType(attribute.getValue());
-								}
+								customAd.setLinkType(attribute.getValue());
 							}
 							else if(attributeName.equals("launchType")) {
-								if(attribute.isSetValue()) {
-									customAd.setLaunchType(attribute.getValue());
-								}
+								customAd.setLaunchType(attribute.getValue());
 							}
 							else if(attributeName.equals("uid")) {
 							    // We don't care who this belongs to
@@ -976,8 +921,8 @@ public class CacheUtil {
 
 				loaded = true;
 			}
-			catch (AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
+			catch(Exception e) {
+			    AdWhirlUtil.logException(e);
 			}	
 		}
 
@@ -1056,42 +1001,30 @@ public class CacheUtil {
 		while(!loaded) {
 			rations = new ArrayList<Ration>();
 
-			//Get weights for custom networks of aid
-			//TODO - we shouldn't need "is null"
-			String select = "select `weight`, `cid` from `" + AdWhirlUtil.DOMAIN_APP_CUSTOMS + "` where `aid` = '" + aid + "' and `deleted` is null";
-
-			SelectRequest request = new SelectRequest(select, null);
+			// TODO - remove "is null" from where
+			SelectRequest request = new SelectRequest("select `weight`, `cid` from `" + AdWhirlUtil.DOMAIN_APP_CUSTOMS + "` where `aid` = '" + aid + "' and `deleted` is null");
 			try {
-				SelectResponse response = sdb.select(request);
-				SelectResult result = response.getSelectResult();
-				List<Item> list = result.getItem();
+				SelectResult result = sdb.select(request);
+				List<Item> list = result.getItems();
 
 				for(Item item : list) {	
 					Ration ration = new Ration();
 
 					String acid = item.getName();
 
-					List<Attribute> attributeList = item.getAttribute();
+					List<Attribute> attributeList = item.getAttributes();
 					for(Attribute attribute : attributeList) {
-						if(!attribute.isSetName()) {
-							continue;						
-						}
-						
 						String attributeName = null;
 						
 						try {
 							attributeName = attribute.getName();		
 							if(attributeName.equals("weight")) {
-								if(attribute.isSetValue()) {
-									int weight = AmazonSimpleDBUtil.decodeZeroPaddingInt(attribute.getValue());
-									ration.setWeight(weight);
-								}
+								int weight = SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
+								ration.setWeight(weight);
 							}	
 							else if(attributeName.equals("cid")) {
-								if(attribute.isSetValue()) {
-									String cid = attribute.getValue();
-									ration.setNid(cid);
-								}
+								String cid = attribute.getValue();
+								ration.setNid(cid);
 							}
 						}
 						catch(NumberFormatException e) {
@@ -1106,8 +1039,8 @@ public class CacheUtil {
 				}		
 				loaded = true;
 			}
-			catch (AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
+			catch (Exception e) {
+			    AdWhirlUtil.logException(e);
 			}	
 		}
 
@@ -1122,39 +1055,29 @@ public class CacheUtil {
 
 		boolean loaded = false;
 		while(!loaded) {
-			//Get weights for custom networks of aid
-			String select = "select `key` from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + AdWhirlUtil.NETWORKS.MDOTM.ordinal() + "' limit 1";
-
-			SelectRequest request = new SelectRequest(select, null);
+			//Get weights for adrollo networks of aid
+			SelectRequest request = new SelectRequest("select `key` from `" + AdWhirlUtil.DOMAIN_NETWORKS + "` where `aid` = '" + aid + "' and `type` = '" + AdWhirlUtil.NETWORKS.MDOTM.ordinal() + "' limit 1");
 			try {
-				SelectResponse response = sdb.select(request);
-				SelectResult result = response.getSelectResult();
-				List<Item> list = result.getItem();
+				SelectResult result = sdb.select(request);
+				List<Item> list = result.getItems();
 
 				for(Item item : list) {	
 					ration = new Ration(item.getName());
 
-					List<Attribute> attributeList = item.getAttribute();
+					List<Attribute> attributeList = item.getAttributes();
 					for(Attribute attribute : attributeList) {
-						if(!attribute.isSetName()) {
-							continue;						
-						}
-
 						String attributeName = attribute.getName();		
 						if(attributeName.equals("key")) {
-							if(attribute.isSetValue()) {
-								ration.setNetworkKey(attribute.getValue());
-								break;
-							}
+							ration.setNetworkKey(attribute.getValue());
+							break;
 						}
 					}
 				}
 
 				loaded = true;
 			}
-			catch (AmazonSimpleDBException e) {
-				log.error("Error querying SimpleDB: " + e.getMessage());
-				return;
+			catch (Exception e) {
+			    AdWhirlUtil.logException(e);
 			}	
 		}
 
