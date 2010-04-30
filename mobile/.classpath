@@ -17,8 +17,8 @@
 	<classpathentry kind="lib" path="res/configs"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.22.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-util-6.1.22.jar"/>
-	<classpathentry kind="lib" path="lib/aws-java-sdk-1.0.002.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-asl-1.4.3.jar"/>
 	<classpathentry kind="lib" path="lib/saxon9he.jar"/>
+	<classpathentry kind="lib" path="lib/aws-java-sdk-1.0.003.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
