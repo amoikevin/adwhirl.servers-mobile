@@ -101,8 +101,8 @@ end
 #   DEPLOYMENT TASKS
 # =============================================================================
 
-#before :deploy, :deregister_instance_from_lb
-#after :deploy, :register_instance_with_lb
+before :deploy, :deregister_instance_from_lb
+after :deploy, :register_instance_with_lb
 
 desc "Describe instance health"
 task :describe_instance_health do
