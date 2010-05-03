@@ -15,14 +15,15 @@ public class SDBBackup {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
 		Date date = new java.util.Date();
 		String dateString = dateFormat.format(date);
-		
-		/*
+
+		StringBuffer filesToTar = new StringBuffer();
 		List<Thread> threads = new ArrayList<Thread>();
 
-		for(String domain : SDBUtil.DOMAINS) {
-			Thread thread = new Thread(new SDBBackupThread(domain));
+		for(String domain : Util.DOMAINS) {
+			Thread thread = new Thread(new SDBBackupThread(domain, dateString));
 			threads.add(thread);
 			thread.start();
+			filesToTar.append("sdb-" + domain + "-" + dateString + ".json ");
 		}
 
 		for(Thread thread : threads) {
@@ -33,13 +34,11 @@ public class SDBBackup {
 				e.printStackTrace();
 			}
 		}
-		*/
 		
 		Runtime runtime = Runtime.getRuntime();
 		
 		String tarFileName = "sdb-backup-" + dateString + ".tar.gz";
-		String tarCommand = "tar -czf " + tarFileName + " *.json";
-		
+		String tarCommand = "tar -czf " + tarFileName + " " + filesToTar;
 
 		Process process = runtime.exec(tarCommand);
 		process.waitFor();
@@ -47,5 +46,9 @@ public class SDBBackup {
 		File tarFile = new File(tarFileName);
 		AmazonS3 s3 = Util.getS3();
 		s3.putObject("adwhirl-sdb-backups", tarFileName, tarFile);
+
+		String rmCommand = "rm -f " + tarFileName + " " + filesToTar;
+		process = runtime.exec(rmCommand);
+		process.waitFor();
 	}
 }
