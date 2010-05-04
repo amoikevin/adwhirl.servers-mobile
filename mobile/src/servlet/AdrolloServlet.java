@@ -195,12 +195,11 @@ public class AdrolloServlet extends HttpServlet {
 		PrintWriter out = httpServletResponse.getWriter();
 		if(jsonAdrollo == null) {
 			// TODO - Don't know what legacy clients want if we can't provide adrollo json
-			out.print("[]");
+			out.print("{}");
 		}
 		else {
 			out.print(jsonAdrollo);
 		}
 		out.close();	
 	}
-
 }
