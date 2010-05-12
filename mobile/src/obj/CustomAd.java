@@ -17,7 +17,6 @@
 package obj;
 
 public class CustomAd {
-	private String aid = "";
     private String nid = "";
     private int type = 2;
     private String imageLink = "";
@@ -31,10 +30,6 @@ public class CustomAd {
 	this.nid = nid;
     }
 	
-    public String getAid() {
-    	return aid;
-    }
-    
     public String getDescription() {
 	return description;
     }
@@ -58,10 +53,6 @@ public class CustomAd {
     }
     public int getType() {
 	return type;
-    }
-	
-    public void setAid(String aid) {
-    	this.aid = aid;
     }
     
     public void setDescription(String description) {

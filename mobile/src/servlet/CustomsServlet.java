@@ -87,8 +87,9 @@ public class CustomsServlet extends HttpServlet
 		}
 		aid = aid.trim().replaceAll("%20", "");
 		
+		appver = cacheVersionCustom(appver);
 
-		if(appver == 200) {
+		if(appver >= 200) {
 			nid = request.getParameter("nid");	
 			if(nid == null || nid.isEmpty()) {	
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter <nid> is required");
@@ -96,8 +97,6 @@ public class CustomsServlet extends HttpServlet
 			}
 		}
 		else if(appver > 0) {
-			appver = 127;
-
 			nid = pickNid(aid);
 
 			if(nid == null) {
@@ -112,8 +111,6 @@ public class CustomsServlet extends HttpServlet
 		
 		String metricsRequest = "http://localhost/exmet.php?nid=" + nid + "&appid=" + aid + "&type=9&appver=200";
 		new URL(metricsRequest).openStream().close();
-
-		appver = cacheVersionCustom(appver);
 		
 		String key = nid + "_" + appver;
 		Element cachedCustom = customsCache.get(key);
@@ -123,6 +120,9 @@ public class CustomsServlet extends HttpServlet
 		if(cachedCustom != null) {
 			log.debug("Cache hit on \"" + key + "\"");
 			jsonCustom = (String)cachedCustom.getObjectValue();
+
+			//Replace the $aid placeholder with the real aid
+			jsonCustom = jsonCustom.replaceAll("\\$aid", aid);
 		}
 		else {
 			log.warn("Cache <customs> miss on \"" + key + "\"");

@@ -881,7 +881,7 @@ public class CacheUtil {
 								customAd.setType(SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue()));
 							}
 							else if(attributeName.equals("aid")) {
-								customAd.setAid(attribute.getValue());
+							    // Legacy field, shouldn't be used
 							}
 							else if(attributeName.equals("imageLink")) {
 								customAd.setImageLink(attribute.getValue());
@@ -930,7 +930,7 @@ public class CacheUtil {
 		try {
 			genJsonCustoms(getCacheCustoms(), nid, customAd);
 		} catch (JSONException e) {
-			log.error("Error creating jsonConfig: " + e.getMessage());
+			log.error("Error creating jsonCustom: " + e.getMessage());
 			return;
 		}
 	}
@@ -974,7 +974,7 @@ public class CacheUtil {
 		.key("redirect_url")
 		.value(customAd.getLink())
 		.key("metrics_url")
-		.value("http://" + AdWhirlUtil.SERVER + "/exclick.php?nid=" + customAd.getNid() + "&appid=" + customAd.getAid() + "&type=9&appver=200")
+		.value("http://" + AdWhirlUtil.SERVER + "/exclick.php?nid=" + customAd.getNid() + "&appid=$aid&type=9&appver=200")
 		.key("metrics_url2")
 		.value("")
 		.key("ad_type")

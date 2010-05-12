@@ -56,7 +56,7 @@ public class Invoker {
 		CacheUtil.initalize();
 		CacheUtil.preload();
 
-		Server server = new Server(80);
+		Server server = new Server(8080);
 
 		/*
 		  QueuedThreadPool threadPool = new QueuedThreadPool();
