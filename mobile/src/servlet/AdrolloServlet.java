@@ -192,14 +192,11 @@ public class AdrolloServlet extends HttpServlet {
 		httpServletResponse.setCharacterEncoding("UTF-8");
 		httpServletResponse.setContentType("application/json");
 
-		PrintWriter out = httpServletResponse.getWriter();
-		if(jsonAdrollo == null) {
-			// TODO - Don't know what legacy clients want if we can't provide adrollo json
-			out.print("{}");
+
+		if(jsonAdrollo != null) {
+		    PrintWriter out = httpServletResponse.getWriter();
+		    out.print(jsonAdrollo);
+		    out.close();	
 		}
-		else {
-			out.print(jsonAdrollo);
-		}
-		out.close();	
 	}
 }
