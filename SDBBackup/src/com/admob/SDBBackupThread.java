@@ -1,9 +1,6 @@
 package com.admob;
 
 import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.json.JSONWriter;
@@ -17,17 +14,16 @@ import com.amazonaws.services.simpledb.model.SelectResult;
 public class SDBBackupThread implements Runnable {
 	private AmazonSimpleDB sdb;
 	private String domain;
+	private String dateString;
 
-	public SDBBackupThread(String domain) {
+	public SDBBackupThread(String domain, String dateString) {
 		this.domain = domain;
-		sdb = SDBUtil.getSDB();
+		this.dateString = dateString;
+		sdb = Util.getSDB();
 	}
 
 	public void run() {
 		try {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd");
-			Date date = new java.util.Date();
-			String dateString = dateFormat.format(date);
 			FileWriter jsonWriter;
 			jsonWriter = new FileWriter("sdb-" + domain + "-" + dateString + ".json");
 			JSONWriter json = new JSONWriter(jsonWriter);
