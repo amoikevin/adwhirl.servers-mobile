@@ -40,9 +40,10 @@ NOTE: Once you do this Amazon will start billing you.
 You can now check on the status of your instance. This will also give you the instance's DNS name.
 `ec2-describe-instances <i-YYYYYYYY>`
 
-You'll need to authorize SSH and HTTP traffic for the instance.
+You'll need to authorize SSH and HTTP traffic for the instance. Port 8080 is needed for the configuration website.
 `ec2-authorize default -p 22`
 `ec2-authorize default -p 80`
+`ec2-authorize default -p 8080`
 
 Login to the instance as the root user.
 `ssh -i <keyfile> root@domU-AA-AA-AA-AA-AA-AA.ZZZZ.compute.amazonaws.com`
@@ -52,17 +53,18 @@ You should now be logged in, and can start editing the stock AdWhirl AMI.
 NOTE: I highly suggest that you run GNU Screen and work inside it, although it is entirely optional. 
 
 Move into the source directory.
-`cd adwhirl`
+`cd adwhirl-servers`
 
 We've tested this bundle and know that it's good to go, but if you want, you can update from the mercurial branch.
 `hg pull`
+`hg up`
 
 At this point you should take a break from the server and set up the configuration website.
 `cd website`
 Follow the instructions in the website README, and then come back here when you've finished.
 
 Now that you've finished with the website, move into the server directory so we can make some edits.
-`cd ~/adwhirl/server`
+`cd ~/adwhirl-servers/mobile`
 
 Now, you'll need to change the utility class and change the server location, include your AWS keys, and any other specific configuration you desire.
 Emacs, vim, nano, ed, etc. are all installed on the instance; feel free to use your editor of choice.
@@ -71,6 +73,10 @@ Emacs, vim, nano, ed, etc. are all installed on the instance; feel free to use y
 Build the new distribution, cleaning first to be safe.
 `ant clean`
 `ant dist`
+`cd dist`
+
+You'll need to make the logs directory.
+`mkdir /mnt/adwhirl`
 
 Now you will have a jar that you can start the services. Start it up. It you plan on serving a lot of traffic, you might want a larger heap size.
 `java -Xmx512m -cp dist/adwhirl.jar Invoker`
