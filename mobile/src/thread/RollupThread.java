@@ -36,6 +36,7 @@ import com.amazonaws.services.simpledb.model.SelectResult;
 import net.sf.ehcache.Element;
 
 import obj.HitObject;
+import obj.HitObjectKey;
 
 import servlet.MetricsServlet;
 
@@ -57,7 +58,7 @@ public class RollupThread implements Runnable {
 			
 			//TODO: change this
 			try {
-				Thread.sleep(5 * 60000);
+				Thread.sleep(1 * 60000);
 			} catch (InterruptedException e) {
 				log.error("Unable to sleep... continuing");
 			}
@@ -67,14 +68,17 @@ public class RollupThread implements Runnable {
 	@SuppressWarnings("unchecked")
 	private void processHitsCache() {
 		log.debug("Processing hitsCache");
-		Iterator<String> it = (Iterator<String>) MetricsServlet.hitsCache.getKeys().iterator();
+		Iterator<HitObjectKey> it = (Iterator<HitObjectKey>) MetricsServlet.hitsCache.getKeys().iterator();
 		while(it.hasNext()) {
-			String nid = it.next();
+			HitObjectKey key = it.next();
 			
-			Element element = MetricsServlet.hitsCache.get(nid);
+			Element element = MetricsServlet.hitsCache.get(key);
 			if(element != null) {
+				String nid = key.nid;
+				String aid = key.aid;
+				
 				HitObject ho = (HitObject)element.getObjectValue();
-				updateSimpleDB(nid, ho);
+				updateSimpleDB(nid, aid, ho);
 			}
 		}
 	}
@@ -119,7 +123,7 @@ public class RollupThread implements Runnable {
 			Element element = MetricsServlet.legacyHitsCache.get(key);
 			if(element != null) {
 				HitObject ho = (HitObject)element.getObjectValue();
-				updateSimpleDB(nid, ho);
+				updateSimpleDB(nid, aid, ho);
 			}
 			else {
 				continue;
@@ -127,10 +131,10 @@ public class RollupThread implements Runnable {
 		}
 	}
 	
-	private void updateSimpleDB(String nid, HitObject ho) {
-		log.debug("Updating nid=\"" + nid + "\"");
+	private void updateSimpleDB(String nid, String aid, HitObject ho) {
+		log.debug("Updating nid=\"" + nid + "\", aid=\"" + aid + "\"");
 		
-		if(nid == null || ho == null) {
+		if(nid == null || aid == null || ho == null) {
 			return;
 		}
 		
@@ -141,7 +145,6 @@ public class RollupThread implements Runnable {
 		SimpleDateFormat sdfDetail = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss");
 		String dateTimeDetail = sdfDetail.format(date);
 		
-
 		String impressions = String.valueOf(ho.impressions);
 		String clicks = String.valueOf(ho.clicks);
 		String type = String.valueOf(ho.type);
@@ -159,6 +162,7 @@ public class RollupThread implements Runnable {
 		List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 
 		list.add(new ReplaceableAttribute().withName("nid").withValue(nid).withReplace(true));
+		list.add(new ReplaceableAttribute().withName("aid").withValue(aid).withReplace(true));
 		list.add(new ReplaceableAttribute().withName("type").withValue(type).withReplace(true));
 		list.add(new ReplaceableAttribute().withName("impressions").withValue(impressions).withReplace(true));
 		list.add(new ReplaceableAttribute().withName("clicks").withValue(clicks).withReplace(true));
@@ -167,7 +171,7 @@ public class RollupThread implements Runnable {
 		putItem(AdWhirlUtil.DOMAIN_STATS_TEMP, UUID.randomUUID().toString().replace("-", ""), list);
 		
 		List<ReplaceableAttribute> list2 = new ArrayList<ReplaceableAttribute>();
-		list2.add(new ReplaceableAttribute().withName("aid").withValue(ho.aid).withReplace(false));
+		list2.add(new ReplaceableAttribute().withName("aid").withValue(aid).withReplace(false));
 		list2.add(new ReplaceableAttribute().withName("dateTime").withValue(dateTimeDetail).withReplace(true));
 		putItem(AdWhirlUtil.DOMAIN_STATS_INVALID, nid, list2);
 	}

@@ -30,6 +30,7 @@ import thread.RollupThread;
 import util.AdWhirlUtil;
 import util.CacheUtil;
 import obj.HitObject;
+import obj.HitObjectKey;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -113,7 +114,7 @@ public class MetricsServlet extends HttpServlet
 	HitObject ho = null;
 
 	Cache cache = null;
-	String key = null;
+	Object key = null;
 
 	int type;
 		
@@ -134,7 +135,9 @@ public class MetricsServlet extends HttpServlet
 	    }			
 
 	    cache = hitsCache;
-	    key = nid;
+	    
+	    // Note: The key for the normal hits cache is a HitObjectKey
+	    key = new HitObjectKey(nid, aid);
 	}
 	else {
 	    //Yes, the legacy type variable is also NID. This NID is an int representing the network type 
@@ -146,6 +149,8 @@ public class MetricsServlet extends HttpServlet
 	    type = Integer.parseInt(s_type);
 
 	    cache = legacyHitsCache;
+	    
+	    // Note: The key for the legacy hits cache is a string
 	    key = aid + "_" + type;
 	}
 		
@@ -155,7 +160,7 @@ public class MetricsServlet extends HttpServlet
 			
 	if(element == null) {
 	    //TODO: Depending on traffic, this may need a semaphore or be generated beforehand
-	    ho = new HitObject(aid, type);
+	    ho = new HitObject(type);
 	    element = new Element(key, ho);
 	    cache.put(element);
 	}

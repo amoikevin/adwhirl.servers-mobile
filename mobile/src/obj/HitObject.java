@@ -21,13 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HitObject {
     public AtomicInteger impressions;
     public AtomicInteger clicks;
-    public String aid;
     public int type;
 	
-    public HitObject(String aid, int type) {
+    public HitObject(int type) {
 	impressions = new AtomicInteger(0);
 	clicks = new AtomicInteger(0);
-	this.aid = aid;
 	this.type = type;
     }
 }

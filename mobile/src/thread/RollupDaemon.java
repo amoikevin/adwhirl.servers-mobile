@@ -106,10 +106,13 @@ public class RollupDaemon implements Runnable {
 					String attributeName = attribute.getName();
 					if(attributeName.equals("aid")) {
 						aid = attribute.getValue();
+
+						// Must be inside for nids with multiple aids (i.e. customs)
+						rollupNetworkStats(nid, aid);
 					}
 				}
-
-				rollupNetworkStats(nid, aid);
+				
+				deleteTempStatsInvalid(nid);
 			}
 
 			log.info("[Thread " + this.threadId + "] Exiting.");
@@ -129,7 +132,7 @@ public class RollupDaemon implements Runnable {
 			int type = 0;
 
 			do {
-				SelectRequest statsRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_STATS_TEMP + "` where `nid` = '" + nid + "'");
+				SelectRequest statsRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_STATS_TEMP + "` where `nid` = '" + nid + "' and `aid` = '" + aid + "'");
 				statsRequest.setNextToken(statsNextToken);
 				try {
 					SelectResult statsResult = sdb.select(statsRequest);
@@ -165,7 +168,7 @@ public class RollupDaemon implements Runnable {
 			while(statsNextToken != null);
 
 			if(updateStats(nid, aid, impressions, clicks, type)) {
-				deleteTempStats(nid, sids);
+				deleteTempStats(sids);
 			}
 		}
 
@@ -179,7 +182,7 @@ public class RollupDaemon implements Runnable {
 
 			String itemName = null;
 
-			SelectRequest statsRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_STATS + "` where `nid` = '" + nid + "' and `dateTime` = '" + dateTime + "'");
+			SelectRequest statsRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_STATS + "` where `nid` = '" + nid + "' and `aid` = '" + aid + "' and `dateTime` = '" + dateTime + "'");
 			try {
 				SelectResult statsResult = sdb.select(statsRequest);
 				List<Item> statsList = statsResult.getItems();
@@ -196,7 +199,7 @@ public class RollupDaemon implements Runnable {
 							clicks += SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
 						}
 					}
-				}			
+				}
 
 				log.info("[Thread " + this.threadId + "] Pushing: date <" + dateTime + ">, nid <" + nid + ">, aid <" + aid + ">, impressions <" + impressions + ">, clicks <" + clicks + ">");
 				List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
@@ -232,7 +235,7 @@ public class RollupDaemon implements Runnable {
 			return calendar.getTime();
 		}
 
-		private void deleteTempStats(String nid, List<String> sids) {
+		private void deleteTempStats(List<String> sids) {
 			for(String sid : sids) {
 				log.debug("Deleting sid=" + sid);
 				DeleteAttributesRequest deleteRequest = new DeleteAttributesRequest(AdWhirlUtil.DOMAIN_STATS_TEMP, sid);
@@ -243,7 +246,9 @@ public class RollupDaemon implements Runnable {
 					return;
 				}
 			}
-
+		}
+		
+		private void deleteTempStatsInvalid(String nid) {
 			log.debug("Deleting nid=" + nid);
 			DeleteAttributesRequest deleteRequest = new DeleteAttributesRequest(AdWhirlUtil.DOMAIN_STATS_INVALID, nid);
 			try {
