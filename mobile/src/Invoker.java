@@ -53,9 +53,9 @@ public class Invoker {
 		*/
 
 		CacheUtil.initalize();
-//		CacheUtil.preload();
+		CacheUtil.preload();
 
-		Server server = new Server(8001);
+		Server server = new Server(80);
 
 		//import org.mortbay.thread.QueuedThreadPool;
 		/*
