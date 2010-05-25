@@ -18,7 +18,7 @@ function start_invoker {
 
     java -server -Xms256m -Xmx1024m -cp adwhirl.jar Invoker >Invoker.log 2>Invoker.err &
 
-    sleep 120
+    sleep 180
 }
 
 function start_daemon {
