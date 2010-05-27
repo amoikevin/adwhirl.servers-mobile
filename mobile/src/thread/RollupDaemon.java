@@ -111,7 +111,7 @@ public class RollupDaemon implements Runnable {
 						rollupNetworkStats(nid, aid);
 					}
 				}
-				
+
 				deleteTempStatsInvalid(nid);
 			}
 
@@ -133,6 +133,7 @@ public class RollupDaemon implements Runnable {
 
 			do {
 				SelectRequest statsRequest = new SelectRequest("select * from `" + AdWhirlUtil.DOMAIN_STATS_TEMP + "` where `nid` = '" + nid + "' and `aid` = '" + aid + "'");
+				statsRequest.setConsistentRead(true);
 				statsRequest.setNextToken(statsNextToken);
 				try {
 					SelectResult statsResult = sdb.select(statsRequest);
@@ -247,14 +248,39 @@ public class RollupDaemon implements Runnable {
 				}
 			}
 		}
-		
+
 		private void deleteTempStatsInvalid(String nid) {
 			log.debug("Deleting nid=" + nid);
 			DeleteAttributesRequest deleteRequest = new DeleteAttributesRequest(AdWhirlUtil.DOMAIN_STATS_INVALID, nid);
 			try {
 				sdb.deleteAttributes(deleteRequest);
-			} catch (Exception e) {
-				AdWhirlUtil.logException(e, log);
+			} 
+			catch (Exception e) {
+				try {
+					try {
+						Thread.sleep(1000);
+					} 
+					catch (InterruptedException ie) {
+						log.error("Unable to sleep... continuing");
+					}
+					sdb.deleteAttributes(deleteRequest);
+				} 
+				catch (Exception e2) {
+					try {
+						Thread.sleep(5000);
+					} 
+					catch (InterruptedException ie) {
+						log.error("Unable to sleep... continuing");
+					}
+					
+					try {
+						sdb.deleteAttributes(deleteRequest);
+					}
+					catch(Exception e3) {
+						AdWhirlUtil.logException(e, log);
+					}
+				}
+				
 				return;
 			}
 		}
