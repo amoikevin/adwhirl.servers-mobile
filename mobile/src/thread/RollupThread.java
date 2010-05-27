@@ -166,8 +166,7 @@ public class RollupThread implements Runnable {
 		list.add(new ReplaceableAttribute().withName("type").withValue(type).withReplace(true));
 		list.add(new ReplaceableAttribute().withName("impressions").withValue(impressions).withReplace(true));
 		list.add(new ReplaceableAttribute().withName("clicks").withValue(clicks).withReplace(true));
-		list.add(new ReplaceableAttribute().withName("dateTime").withValue(dateTime).withReplace(true));
-		
+		list.add(new ReplaceableAttribute().withName("dateTime").withValue(dateTime).withReplace(true));		
 		putItem(AdWhirlUtil.DOMAIN_STATS_TEMP, UUID.randomUUID().toString().replace("-", ""), list);
 		
 		List<ReplaceableAttribute> list2 = new ArrayList<ReplaceableAttribute>();

@@ -54,7 +54,9 @@ public class RollupDaemon implements Runnable {
 		int threadId = 1;
 
 		//We're a makeshift daemon, let's loop forever
-		while(true) {
+		while(true) {		
+			List<Thread> threads = new ArrayList<Thread>();
+
 			String invalidsNextToken = null;
 
 			do {
@@ -66,6 +68,7 @@ public class RollupDaemon implements Runnable {
 					List<Item> invalidsList = invalidsResult.getItems();
 
 					Thread helper = new Thread(new RollupHelper(invalidsList, threadId++));
+					threads.add(helper);
 					helper.start();
 				}
 				catch(Exception e) {
@@ -77,6 +80,15 @@ public class RollupDaemon implements Runnable {
 			}
 			while(invalidsNextToken != null);
 
+			for(Thread thread : threads) {
+				try {
+					thread.join();
+				} 
+				catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			try {
 				Thread.sleep(2 * 60000);
 			} catch (InterruptedException e) {
