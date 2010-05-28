@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -68,6 +69,9 @@ public class RollupThread implements Runnable {
 	@SuppressWarnings("unchecked")
 	private void processHitsCache() {
 		log.debug("Processing hitsCache");
+		
+		int impressions = 0;
+		
 		Iterator<HitObjectKey> it = (Iterator<HitObjectKey>) MetricsServlet.hitsCache.getKeys().iterator();
 		while(it.hasNext()) {
 			HitObjectKey key = it.next();
@@ -78,9 +82,12 @@ public class RollupThread implements Runnable {
 				String aid = key.aid;
 				
 				HitObject ho = (HitObject)element.getObjectValue();
+				impressions += ho.impressions.get();
 				updateSimpleDB(nid, aid, ho);
 			}
 		}
+		
+		log.error("XXXXX Pushed impressions: " + impressions);
 	}
 	
 	@SuppressWarnings("unchecked")
