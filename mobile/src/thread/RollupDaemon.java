@@ -26,6 +26,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -46,6 +47,8 @@ public class RollupDaemon implements Runnable {
 
 	private static AmazonSimpleDB sdb;
 
+	AtomicInteger impressionsFound;
+	
 	public void run() {
 		log.info("RollupDaemon started");
 
@@ -55,6 +58,8 @@ public class RollupDaemon implements Runnable {
 
 		//We're a makeshift daemon, let's loop forever
 		while(true) {		
+			impressionsFound = new AtomicInteger(0);
+			
 			List<Thread> threads = new ArrayList<Thread>();
 
 			String invalidsNextToken = null;
@@ -67,7 +72,7 @@ public class RollupDaemon implements Runnable {
 					invalidsNextToken = invalidsResult.getNextToken();
 					List<Item> invalidsList = invalidsResult.getItems();
 
-					Thread helper = new Thread(new RollupHelper(invalidsList, threadId++));
+					Thread helper = new Thread(new RollupHelper(invalidsList, threadId++, impressionsFound));
 					threads.add(helper);
 					helper.start();
 				}
@@ -89,6 +94,8 @@ public class RollupDaemon implements Runnable {
 				}
 			}
 			
+			log.error("Impressions found: " + impressionsFound);
+			
 			try {
 				Thread.sleep(2 * 60000);
 			} catch (InterruptedException e) {
@@ -100,10 +107,12 @@ public class RollupDaemon implements Runnable {
 	private class RollupHelper implements Runnable {
 		List<Item> invalidsList;
 		int threadId;
+		AtomicInteger impressionsFound;
 
-		public RollupHelper(List<Item> invalidsList, int threadId) {
+		public RollupHelper(List<Item> invalidsList, int threadId, AtomicInteger impressionsFound) {
 			this.invalidsList = invalidsList;
 			this.threadId = threadId;
+			this.impressionsFound = impressionsFound;
 		}
 
 		public void run() {
@@ -163,6 +172,7 @@ public class RollupDaemon implements Runnable {
 							String attributeName = attribute.getName();
 							if(attributeName.equals("impressions")) {
 								impressions += SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
+								impressionsFound.addAndGet(impressions);
 							}
 							else if(attributeName.equals("clicks")) {
 								clicks += SimpleDBUtils.decodeZeroPaddingInt(attribute.getValue());
@@ -213,8 +223,8 @@ public class RollupDaemon implements Runnable {
 						}
 					}
 				}
-
-				log.info("[Thread " + this.threadId + "] Pushing: date <" + dateTime + ">, nid <" + nid + ">, aid <" + aid + ">, impressions <" + impressions + ">, clicks <" + clicks + ">");
+				
+				log.warn("[Thread " + this.threadId + "] Pushing: date <" + dateTime + ">, nid <" + nid + ">, aid <" + aid + ">, impressions <" + impressions + ">, clicks <" + clicks + ">");
 				List<ReplaceableAttribute> list = new ArrayList<ReplaceableAttribute>();
 				list.add(new ReplaceableAttribute().withName("impressions").withValue(String.valueOf(impressions)).withReplace(true));
 				list.add(new ReplaceableAttribute().withName("clicks").withValue(String.valueOf(clicks)).withReplace(true));
