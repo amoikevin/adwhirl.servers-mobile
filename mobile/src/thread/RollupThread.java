@@ -93,6 +93,9 @@ public class RollupThread implements Runnable {
 	@SuppressWarnings("unchecked")
 	private void processLegacyHitsCache() {
 		log.debug("Processing legacyHitsCache");
+		
+		int impressions = 0;
+		
 		Iterator<String> it = MetricsServlet.legacyHitsCache.getKeys().iterator();
 		while(it.hasNext()) {
 			String key = it.next();
@@ -130,12 +133,15 @@ public class RollupThread implements Runnable {
 			Element element = MetricsServlet.legacyHitsCache.get(key);
 			if(element != null) {
 				HitObject ho = (HitObject)element.getObjectValue();
+				impressions += ho.impressions.get();
 				updateSimpleDB(nid, aid, ho);
 			}
 			else {
 				continue;
 			}
 		}
+		
+		log.error("XXXXX Pushed legacy impressions: " + impressions);
 	}
 	
 	private void updateSimpleDB(String nid, String aid, HitObject ho) {
