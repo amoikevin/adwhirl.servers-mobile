@@ -195,7 +195,8 @@ class HouseAdUtil {
   public static function getFixedLink($link, $linkType) {
     switch($linkType) {
     case HouseAd::HOUSEAD_LINKTYPE_WEBSITE:
-      if(!(stripos($link, 'http') === 0)) {
+	// Make sure the link starts with "<scheme>://" (e.g. 'http://', 'myapp://')
+      if(preg_match('@^([\w-]+://).*@', $link) === 0) {
 	return $link = 'http://'.$link;
       }
       break;
