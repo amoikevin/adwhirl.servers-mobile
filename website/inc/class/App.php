@@ -163,7 +163,7 @@ class App extends SDBObject {
     if ($count==0 && $add_ahid!=null) {
         $count++;
     }
-    if ($count==1 && $appHouseAds['0']->id==$del_ahid) {
+    else if ($count==1 && $appHouseAds['0']->id==$del_ahid) {
         $count--;
     }
     fb("appHouseAds", $appHouseAds);
@@ -182,7 +182,7 @@ class App extends SDBObject {
       $network->put();
       $retVal = "add";				
     }
-    if ($count==0 && isset($houseAdNet)) {			// should remove or turn off
+    else if ($count==0 && isset($houseAdNet)) {			// should remove or turn off
       $hasHouseAds = count(HouseAdUtil::getHouseAdsByUid($_SESSION['uid']))>0;
       if ($hasHouseAds) {
           fb("should turn off");
