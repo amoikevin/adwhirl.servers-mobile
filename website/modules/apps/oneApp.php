@@ -346,10 +346,15 @@ class oneApp extends appsBase {
 
     $app->put();
     $_POST['aid'] = $app->id;
-    
-    $this->redirect($_REQUEST['returnPage'] . '?&n_aid=' . $app->id . '&n_name=' . $name . '&n_platform=' . $platform);    
-    
-    // $this->redirect('/apps');
+
+    // before finishing, check to see if the new app has been added to th SDB
+    $sdb = SDB::getInstance();
+    // sleeps for half a second until we see an entry for this id
+    $fields = "name";
+    while(!($sdb->get($app->getSDBDomain(), $app->id, $fields))) {
+      $fields = "name";// necessary since get overwrites $fields
+      usleep(500);
+    }
   }
 
   public function info() {

@@ -5,7 +5,7 @@
   </div>
 <div style="clear:right"></div>
     <form id="infoForm" action="/apps/oneApp/createSubmit" enctype="multipart/form-data" method="post">
-	    <input type="hidden" name="returnPage" value="{$returnPage}" class="text"/>
+	    <input type="hidden" id="returnPage" name="returnPage" value="{$returnPage}" class="text"/>
 	
         <div id="appInfo" class="section">
           <div class="sectionHeader sectionHeaderActive">
@@ -86,6 +86,12 @@
 		  	<a href="{$returnPage}" class="cancel">Cancel</a>
 			</div>
 </div>
+<div id="waitingDialog" class="hidden">
+	<div class="modalTop center">
+		<img src="/img/ajax-loader.gif"><span class="modalHeader">&nbsp;Your settings are being updated.</span>
+	</div>
+	<div class="modalBottom"></div>
+</div>
 <script>
 {literal}
 $(document).ready(function() {
@@ -105,12 +111,15 @@ $(document).ready(function() {
   });
   $('#save').bind("click",
     function(e) {
-			if (!$(this).is(".disabled")) {
-				$(".blur").each(function() {					
-					$(this).val($(this).attr('default'));
-				});
-	      $("#infoForm").submit();
-			}
+      if (!$(this).is(".disabled")) {
+        $(".blur").each(function() {					
+	  $(this).val($(this).attr('default'));
+	});
+	$("#waitingDialog").modal({ opacity:80, overlayCss: {backgroundColor:"#fff"} });
+	$.post("/apps/oneApp/createSubmit", $("#infoForm").serialize(), function(){
+	  window.location = $("#returnPage").val();
+	});
+      }
     });
 	var activateSave = function() {
  	 $("#save").removeClass("disabled").parent().removeClass("disabled");
