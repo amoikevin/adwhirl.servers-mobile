@@ -50,9 +50,9 @@ Impression
 
 
 <script type="text/javascript">
-	var csvURL = "{$csvURL}";
-	var dataURL = "{$dataURL}";
-	var htmlTableURL = "{$htmlTableURL}";  
+  var csvURL = "{$csvURL}";
+  var dataURL = "{$dataURL}";
+  var htmlTableURL = "{$htmlTableURL}";  
   var chart;
   var orgQueryParam = '{$queryParam}';
   var isShowDeleted = {if $showDeleted}true{else}false{/if};
@@ -73,28 +73,32 @@ Impression
     $.get(htmlTableURL+queryParam, function(data){
       $("#table").html(data);
      });
-		// $.get(dataURL + queryParam, function(data) {
-		// 	console.log(data);
-		// });    
   }  
+  // Necessary to display the correct chart - see www.fusioncharts.com/docs/Contents/JSDataURL.html
+  function FC_Rendered(DOMId){
+    //This method is called whenever a FusionCharts chart is loaded.
+    //Check if it's the required chart using ID
+    if (DOMId=="SalesByCat"){
+      update(orgQueryParam+'&aid='+$("#appOptions").val());
+    }
+  } 
   $(document).ready(function() {
+    showDeleted(isShowDeleted);
     $("#showDeleted").change(function() {
       showDeleted($(this).is(":checked"));
     });
-    showDeleted(isShowDeleted);
-		$("#dateOptions").change(function() {
-			update($("#dateOptions").val()+"&aid="+$("#appOptions").val());
-		})
-		$("#appOptions").change(function() {
-			update($("#dateOptions").val()+"&aid="+$("#appOptions").val());			            
-			$("#subtitle").text($('#appOptions :selected').text())
-		});
+
     chart = new FusionCharts("/FusionCharts/MSLine.swf", "SalesByCat", "790", "400", "0", "1");
-    chart.setDataURL(dataURL+orgQueryParam+'&aid='+$("#appOptions").val());
+    // Start it out blank so it doesn't get the wrong data
+    chart.setDataXML("<chart></chart>");
     chart.render("chartDiv");
-    $.get(htmlTableURL+orgQueryParam, function(data){
-      $("#table").html(data);
-     });
+    $("#dateOptions").change(function() {
+      update($("#dateOptions").val()+"&aid="+$("#appOptions").val());
+    });
+    $("#appOptions").change(function() {
+      update($("#dateOptions").val()+"&aid="+$("#appOptions").val());			            
+      $("#subtitle").text($('#appOptions :selected').text())
+    });
   });  
 {/literal}
 </script>

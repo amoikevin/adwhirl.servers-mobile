@@ -83,23 +83,22 @@ class applicationReports extends reportsBase {
   public function applicationReports() {
     $result = $this->getTableData();    
     $this->smarty->assign('showDeleted', isset($_SESSION['showDeleted']));    
-		$apps = array();
-		$appsArray = AppUtil::getAppsByUid($_SESSION['uid'], false);
-		usort($appsArray, 'sortByName');
+    $apps = array();
+    $appsArray = AppUtil::getAppsByUid($_SESSION['uid'], false);
+    usort($appsArray, 'sortByName');
 		
-		foreach ($appsArray as $app) {
-			$apps[$app->id] = $app->name . ($app->deleted?' -- deleted':'');
-		}
-		// $this->subtitle = "Reports";
+    foreach ($appsArray as $app) {
+      $apps[$app->id] = $app->name . ($app->deleted?' -- deleted':'');
+    }
     $this->subtitle = empty($this->aid)?"Reports":$apps[$this->aid];
-		$this->smarty->assign('appsOption', $apps);
-		$this->smarty->assign('selectedApp', $this->aid);
-		$this->smarty->assign('selectedDate', $this->selectedDate);
+    $this->smarty->assign('appsOption', $apps);
+    $this->smarty->assign('selectedApp', $this->aid);
+    $this->smarty->assign('selectedDate', $this->selectedDate);
     $this->smarty->assign('networks', $result['networks']);
     $this->smarty->assign('sideNav_current', 'applications');
     $this->smarty->assign('apps', $result['apps']);
     $this->smarty->assign('dataURL', 'http://'.$_SERVER['SERVER_NAME'].'/reports/applicationReports/getXML');
-		$this->smarty->assign('dateOptions', $this->dateOptions);
+    $this->smarty->assign('dateOptions', $this->dateOptions);
     $this->smarty->assign('queryParam', $this->selectedDate);
     $this->smarty->assign('csvURL', '/reports/applicationReports/getCSV');
     $this->smarty->assign('htmlTableURL', '/reports/applicationReports/getHTMLTable');
@@ -115,12 +114,12 @@ class applicationReports extends reportsBase {
     for($i=$this->startDate; $i<=$this->endDate; $i=date('Y-m-d', strtotime("+ 1day", strtotime($i)))) {
       $dates[] = $i;
     }
-		fb('getHTMLTable-reports',$reports);
+    fb('getHTMLTable-reports',$reports);
     $this->smarty->assign('reports', $reports);
     $this->smarty->assign('nets', $reports['nets']);
     $this->smarty->assign('dates', $dates);
-		$this->smarty->assign('metric', 'impressions');
-		$this->smarty->assign('metricLabel', 'Total Impressions');
+    $this->smarty->assign('metric', 'impressions');
+    $this->smarty->assign('metricLabel', 'Total Impressions');
     return $this->smarty->fetch('../tpl/www/reports/applicationReportsOneAppCSV.tpl');
 
   }
@@ -133,14 +132,13 @@ class applicationReports extends reportsBase {
     for($i=$this->startDate; $i<=$this->endDate; $i=date('Y-m-d', strtotime("+ 1day", strtotime($i)))) {
       $dates[] = $i;
     }
-		fb('getHTMLTable-reports',$reports);
+    fb('getHTMLTable-reports', $reports);
     $this->smarty->assign('reports', $reports);
     $this->smarty->assign('nets', $reports['nets']);
     $this->smarty->assign('dates', $dates);
-		$this->smarty->assign('metric', 'impressions');
-		$this->smarty->assign('metricLabel', 'Total Impressions');
+    $this->smarty->assign('metric', 'impressions');
+    $this->smarty->assign('metricLabel', 'Total Impressions');
     return $this->smarty->fetch('../tpl/www/reports/houseAdReportsTable.tpl');    
-		
   }
   
   public function getXML() {
@@ -153,7 +151,7 @@ class applicationReports extends reportsBase {
       $apps = AppUtil::getAppsByUid($this->user->id);
       $app = $apps['0'];
     }
-    
+
     $reports = ReportUtil::getReportsByAid($app->id, $this->startDate, $this->endDate);
 
     fb("reports",$reports);
@@ -163,7 +161,7 @@ class applicationReports extends reportsBase {
     $this->smarty->assign('reports', $new_reports);
     $this->smarty->assign('nets', $reports['nets']);
     $this->smarty->assign('dates', $new_reports['dates']);
-		$this->smarty->assign('metric', 'impressions');
+    $this->smarty->assign('metric', 'impressions');
     return $this->smarty->fetch('../tpl/www/reports/applicationReportsXML.tpl');
   }
 }
