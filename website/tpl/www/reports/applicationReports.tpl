@@ -90,8 +90,8 @@ Impression
 			$("#subtitle").text($('#appOptions :selected').text())
 		});
     chart = new FusionCharts("/FusionCharts/MSLine.swf", "SalesByCat", "790", "400", "0", "1");
-  	chart.setDataURL(dataURL+orgQueryParam);
-  	chart.render("chartDiv");
+    chart.setDataURL(dataURL+orgQueryParam+'&aid='+$("#appOptions").val());
+    chart.render("chartDiv");
     $.get(htmlTableURL+orgQueryParam, function(data){
       $("#table").html(data);
      });
