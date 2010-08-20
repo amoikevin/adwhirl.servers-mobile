@@ -189,7 +189,7 @@ function adjustGoalType() {
 	});
 	if (isEdit) {
 		if (hasNoAndroidApp) banFor('iPhone');	
-		if (hasNoiPhoneApp) bandFor('Android');		
+		if (hasNoiPhoneApp) banFor('Android');		
 	}
 	if (isEdit) {
 		$(".appCheckBox:checked").each(function() {		
