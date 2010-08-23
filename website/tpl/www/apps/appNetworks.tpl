@@ -513,20 +513,21 @@ $(document).ready(function() {
   $('.setKeyButton').bind("click",
         function(e) {
           e.preventDefault();
-					traffic.setSum();
-          var id;
-          var nid = $(this).attr('val_nid');    
-		  		var inputs = $(this).parents(".appInfoTip").find('[name=key[]]');
-				  var keys = new Array();
-				  errorObj.reset();
-					$(".error").remove();
-				  inputs.each(function(i) {					
-						if (inputs[i].value=="") {
-							errorObj.attacheError(this,'This key is required.')
-						}
-						keys[i]=inputs[i].value;		    
-				  });
-					if (errorObj.hasError()) return false;
+          // Disable the button while we save so it only gets pushed once to the DB
+          $(this).parent().removeClass('enabled').addClass('disabled');
+          traffic.setSum();
+          var nid = $(this).attr('val_nid');
+          var inputs = $(this).parents(".appInfoTip").find('[name=key[]]');
+          var keys = new Array();
+          errorObj.reset();
+          $(".error").remove();
+          inputs.each(function(i) {
+            if (inputs[i].value=="") {
+              errorObj.attacheError(this,'This key is required.')
+            }
+            keys[i]=inputs[i].value;
+          });
+          if (errorObj.hasError()) return false;
           var obj = {
                   'keys[]':keys,
                   'nid':nid,
@@ -535,27 +536,27 @@ $(document).ready(function() {
           $.ajax({
             type:'POST',
             url:"/apps/oneApp/appNetworkKeySubmit",
-						context: $(this),
+            context: $(this),
             data:obj,
             success: function (data) {
               $(".appInfoTip").hide();
-							var type = $($(this).context).attr('val_type');
-							if (type=="17") {
-								window.location = window.location;
-							} else {								
-					  		var inputs = $(this).parents(".appInfoTip").find("[name='key[]']");
-							inputs.each(function() {
-								$(this).attr("orig",$(this).val());									
+              var type = $($(this).context).attr('val_type');
+              if (type=="17") {
+                window.location = window.location;
+              } else {
+                var inputs = $(this).parents(".appInfoTip").find("[name='key[]']");
+                inputs.each(function() {
+                  $(this).attr("orig",$(this).val());
 //									$(this).val($(this).attr("orig"));
-							});
-							var $tr = $(this).parents("tr");
-							$tr.find("input[name='nid[]']").val(data);
-							$link = $('<a class="onOffImg onOffImgOff"></a>').click(setOnOff);
-							$tr.find('td.adServing').html('').append($link);
-							$tr.find('input.adServing').val(1);
-							$tr.find('.deleteNetwork').parent().removeClass('disabled');
-							$link.trigger('click');															
-							}
+                });
+                var $tr = $(this).parents("tr");
+                $tr.find("input[name='nid[]']").val(data);
+                var $link = $('<a class="onOffImg onOffImgOff"></a>').click(setOnOff);
+                $tr.find('td.adServing').html('').append($link);
+                $tr.find('input.adServing').val(1);
+                $tr.find('.deleteNetwork').parent().removeClass('disabled');
+                $link.trigger('click');
+              }
             },
             error: function(e) {
               alert("saveError:"+e);
@@ -563,7 +564,7 @@ $(document).ready(function() {
           });
         }
     );
-		traffic.setSumOnly();		
+    traffic.setSumOnly();
 });
 
 {/literal}
