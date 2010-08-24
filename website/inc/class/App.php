@@ -81,7 +81,23 @@ class App extends SDBObject {
     return self::$SDBFields;
   }
 
+  function __construct($id = null) {
+    parent::__construct($id);
+
+    if($id != null) {
+      $uid = isset($_SESSION['uid']) ? $_SESSION['uid'] : null;
+      if($uid == null || $uid != $this->uid) {
+	die;
+      }
+    }
+  }
+
   public function put() {
+    $uid = isset($_SESSION['uid']) ? $_SESSION['uid'] : null;
+    if($uid == null || $uid != $this->uid) {
+      die;
+    }
+
     parent::put();
 
     CacheUtil::invalidateApp($this->id);
