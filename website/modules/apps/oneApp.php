@@ -204,6 +204,11 @@ class oneApp extends appsBase {
     $this->printHeader = false;
     $this->printFooter = false;
     $this->needsApp();
+
+    if($this->user->id != $this->app->uid) {
+      die;
+    }
+
     $nids = isset($_POST['nid']) ? $_POST['nid'] : null;
     $priorities = isset($_POST['priority']) ? $_POST['priority'] : null;
     $weights = isset($_POST['weight']) ? $_POST['weight'] : null;
@@ -228,7 +233,7 @@ class oneApp extends appsBase {
       	*/
       }
       $network->aid = $this->app->id;
-      $network->weight = $weights[$i];
+      $network->weight = isset($weights[$i]) ? $weights[$i] : null;
       $network->adsOn = $adsOn[$i];			
       if ($adsOn[$i]=="1") {
 	      $network->priority = $priorities[$i];
@@ -255,6 +260,10 @@ class oneApp extends appsBase {
     $this->needsApp();
     $this->printHeader = false;
     $this->printFooter = false;
+
+    if($this->user->id != $this->app->uid) {
+      die;
+    }
     
     $aid = $_POST['aid'];
     $nid = $_POST['nid'];
