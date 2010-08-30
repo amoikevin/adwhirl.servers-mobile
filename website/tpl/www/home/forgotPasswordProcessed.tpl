@@ -1,1 +1,0 @@
-Look for an email from us with directions on how to reset your password.
