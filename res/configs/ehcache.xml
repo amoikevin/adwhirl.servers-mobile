@@ -47,14 +47,7 @@ limitations under the License.
 			eternal="true"
 			overflowToDisk="true"
 			diskSpoolBufferSizeMB="200"
-			/>	
-	<cache name="adrolloRations"
-			maxElementsInMemory="100000"
-			maxElementsOnDisk="10000000"
-			eternal="true"
-			overflowToDisk="true"
-			diskSpoolBufferSizeMB="200"
-			/>	
+			/>
 	<cache name="hitsCache"
 			maxElementsInMemory="100000"
 			maxElementsOnDisk="10000000"
@@ -73,5 +66,4 @@ limitations under the License.
 			timeToIdleSeconds="600"
 			memoryStoreEvictionPolicy="LFU"
 			/>
-            
 </ehcache>

@@ -22,7 +22,7 @@ public class Ration {
 	private String nid = "";
 	private int type = 0;
 	private String nname = "";
-	private int weight = 0;
+	private double weight = 0;
 	private String networkKey = "";
 	private int priority = 0;
 	
@@ -52,10 +52,10 @@ public class Ration {
 		return this.nname;
 	}
 	
-	public int getWeight() {
+	public double getWeight() {
 		return this.weight;
 	}
-	public void setWeight(int weight) {
+	public void setWeight(double weight) {
 		this.weight = weight;
 	}
 	

@@ -73,7 +73,6 @@ Emacs, vim, nano, ed, etc. are all installed on the instance; feel free to use y
 Build the new distribution, cleaning first to be safe.
 `ant clean`
 `ant dist`
-`cd dist`
 
 You'll need to make the logs directory.
 `mkdir /mnt/adwhirl`

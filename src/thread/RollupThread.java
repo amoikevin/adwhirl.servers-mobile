@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -87,7 +86,7 @@ public class RollupThread implements Runnable {
 			}
 		}
 		
-		log.error("XXXXX Pushed impressions: " + impressions);
+		log.debug("XXXXX Pushed impressions: " + impressions);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -141,7 +140,7 @@ public class RollupThread implements Runnable {
 			}
 		}
 		
-		log.error("XXXXX Pushed legacy impressions: " + impressions);
+		log.debug("XXXXX Pushed legacy impressions: " + impressions);
 	}
 	
 	private void updateSimpleDB(String nid, String aid, HitObject ho) {

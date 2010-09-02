@@ -99,9 +99,11 @@ public class ConfigServlet extends HttpServlet {
 	}
 
 	private int cacheConfigVersion(int appver) {
-		if(appver >= 200) 
+		if(appver >= 250) 
+			return 250;
+		else if(appver >= 200)
 			return 200;
-		else if(appver > 103) 
+		else if(appver >= 127) 
 			return 127;
 		else 
 			return 103;

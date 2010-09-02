@@ -93,7 +93,6 @@ public class InvalidateThread implements Runnable {
 				for(Item item : invalidsList) {
 					String aid = item.getName();
 					log.info("Cached response for app customs <" + aid + "> may be invalid");
-					CacheUtil.loadAdrollo(aid);
 					CacheUtil.loadAppCustom(aid);
 					CacheUtil.loadApp(aid);
 				}

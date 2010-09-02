@@ -41,7 +41,6 @@ public class CacheConfigLoaderThread implements Runnable {
 		for(Item item : appsList) {
 			String aid = item.getName();
 			CacheUtil.loadApp(aid);
-			CacheUtil.loadAdrollo(aid);
 		}
 	}
 }

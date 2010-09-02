@@ -25,7 +25,9 @@ import com.amazonaws.services.simpledb.AmazonSimpleDB;
 import com.amazonaws.services.simpledb.AmazonSimpleDBClient;
 
 public class AdWhirlUtil {
-	public static final String SERVER = "AdWhirlLB-473732162.us-east-1.elb.amazonaws.com";
+        public static final String SERVER =
+            "CHANGEME";
+
 
 	public static final String DOMAIN_APP_CUSTOMS = "app_customs";
 	public static final String DOMAIN_APPS = "apps";
@@ -40,8 +42,13 @@ public class AdWhirlUtil {
 	public static final String DOMAIN_USERS_FORGOT = "users_forgot";
 	public static final String DOMAIN_USERS_UNVERIFIED = "users_unverified";
 
-    public static final String myAccessKey = "CHANGEME";
-    public static final String mySecretKey = "CHANGEME";
+        public static final String myAccessKey =
+            "CHANGEME";
+
+
+        public static final String mySecretKey =
+            "CHANGEME";
+
 
 	//Special characters need to be escaped.
 	public static final String KEY_SPLIT = "\\|;\\|";
@@ -95,7 +102,7 @@ public class AdWhirlUtil {
 		case 11:
 			return "mobclix";
 		case 12:
-			return "mdotm"; 
+			return "mdotm";
 		case 13:
 			return "adrollo";  //4thscreen
 		case 14:
@@ -131,7 +138,7 @@ public class AdWhirlUtil {
 	}
 
 	public static AmazonSimpleDB getSDB() {
-		return new AmazonSimpleDBClient(new BasicAWSCredentials(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey));	
+		return new AmazonSimpleDBClient(new BasicAWSCredentials(AdWhirlUtil.myAccessKey, AdWhirlUtil.mySecretKey));
 	}
 
 	public static void logException(Exception e, Logger log) {
@@ -145,7 +152,7 @@ public class AdWhirlUtil {
 			log.warn("\tAWS Error Code:   " + ase.getErrorCode());
 			log.warn("\tError Type:       " + ase.getErrorType());
 			log.warn("\tRequest ID:       " + ase.getRequestId());
-		} 
+		}
 		else if(eClass == AmazonClientException.class) {
 			AmazonClientException ace = (AmazonClientException)e;
 			log.warn("Caught an AmazonClientException:");
@@ -154,5 +161,9 @@ public class AdWhirlUtil {
 		else {
 			log.warn("Exception caught: ", e);
 		}
+	}
+
+	public static double round(double number, int precision) {
+		return Math.round(number * Math.pow(10, precision))/Math.pow(10, precision);
 	}
 }

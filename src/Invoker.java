@@ -24,9 +24,9 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.handler.RequestLogHandler;
-import org.mortbay.jetty.servlet.*;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
-import servlet.AdrolloServlet;
 import servlet.ConfigServlet;
 import servlet.CustomsServlet;
 import servlet.HealthCheckServlet;
@@ -73,13 +73,14 @@ public class Invoker {
 	        // CustomsServlet must be added before ConfigServlet
 			servletContext.addServlet(new ServletHolder(new	CustomsServlet()), "/custom.php");
 			servletContext.addServlet(new ServletHolder(new	ConfigServlet()), "/getInfo.php");
-			servletContext.addServlet(new ServletHolder(new	AdrolloServlet()), "/adrollo.php");
+			
 			ServletHolder metricsServletHolder = new ServletHolder(new MetricsServlet());
 			servletContext.addServlet(metricsServletHolder, "/exmet.php");
 			servletContext.addServlet(metricsServletHolder, "/exclick.php");
+			
 			servletContext.addServlet(new ServletHolder(new	HealthCheckServlet()), "/ping");
+			
 	        RequestLogHandler requestLogHandler = new RequestLogHandler();
-
 	        NCSARequestLog requestLog = new NCSARequestLog("/mnt/adwhirl/jetty-yyyy_mm_dd.request.log");
 	        requestLog.setRetainDays(8);
 	        requestLog.setAppend(true);
@@ -90,7 +91,8 @@ public class Invoker {
 	        handlers.setHandlers(new Handler[]{contextHandlerCollection ,requestLogHandler});
 	        server.setHandler(handlers);
 	        server.start();
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			log.fatal("Unable to start server: " + e.getMessage());
 			System.exit(0);
 		}		
