@@ -33,9 +33,10 @@ Generate a key pair, so you can log in to the AMI.
 `ec2-add-keypair adwhirl-keypair`
 Save the key to file, including the --BEGIN-- and --END-- lines.
 
-Find the instance of the now running AMI.
+NOTE: After you start an instance with the next command, Amazon will start billing you.
+
+Run an instance of the latest AdWhirl AMI.
 `ec2-run-instances <ami-XXXXXXXX> -k adwhirl-keypair`
-NOTE: Once you do this Amazon will start billing you.
 
 You can now check on the status of your instance. This will also give you the instance's DNS name.
 `ec2-describe-instances <i-YYYYYYYY>`
@@ -52,21 +53,14 @@ You should now be logged in, and can start editing the stock AdWhirl AMI.
 
 NOTE: I highly suggest that you run GNU Screen and work inside it, although it is entirely optional. 
 
-Move into the source directory.
-`cd adwhirl-servers`
-
-We've tested this bundle and know that it's good to go, but if you want, you can update from the mercurial branch.
-`hg pull`
-`hg up`
-
 At this point you should take a break from the server and set up the configuration website.
-`cd website`
+`cd ~/adwhirl-servers-website`
 Follow the instructions in the website README, and then come back here when you've finished.
 
 Now that you've finished with the website, move into the server directory so we can make some edits.
-`cd ~/adwhirl-servers/mobile`
+`cd ~/adwhirl-servers-mobile`
 
-Now, you'll need to change the utility class and change the server location, include your AWS keys, and any other specific configuration you desire.
+You'll need to change the utility class and change the server location, include your AWS keys, and any other specific configuration you desire.
 Emacs, vim, nano, ed, etc. are all installed on the instance; feel free to use your editor of choice.
 `emacs src/util/AdWhirlUtil.java`
 
